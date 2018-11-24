@@ -1,5 +1,7 @@
 build:
-	env GOOS=linux go build
+	env GOOS=linux go build -o bin/wechat-backend
+	upx bin/wechat-backend
 
-push:
-	scp wechat-backend root@surenpi.com:/root
+image: build
+	docker build -t surenpi/jenkins-wechat .
+	docker push surenpi/jenkins-wechat

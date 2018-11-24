@@ -97,7 +97,7 @@ func makeNewsResponseBody(fromUserName, toUserName, content string) ([]byte, err
 		Articles: []Article{{
 			Title:       "来自 Jenkins 官方的消息",
 			Description: "来自 Jenkins 官方的消息",
-			PicUrl:      "PicUrl",
+			PicUrl:      "https://raw.githubusercontent.com/jenkins-infra/wechat/master/images/vscode-pipeline-linter/example1.gif",
 			Url:         "https://mp.weixin.qq.com/s/4pktvfQ3tJZgqY--VgNgZQ",
 		}},
 	}
@@ -153,6 +153,9 @@ func handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	createWxMenu()
 	http.HandleFunc("/", procRequest)
+	http.HandleFunc("/status", healthHandler)
+
 	log.Fatal(http.ListenAndServe(":18080", nil))
 }
