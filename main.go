@@ -25,6 +25,7 @@ type TextRequestBody struct {
 	MsgType      string
 	Content      string
 	MsgId        int
+	Event        string
 }
 
 func makeSignature(timestamp, nonce string) string {
@@ -64,15 +65,23 @@ func procRequest(w http.ResponseWriter, r *http.Request) {
 				textRequestBody.Content,
 				textRequestBody.FromUserName)
 
-			responseTextBody, err := makeNewsResponseBody(textRequestBody.ToUserName,
-				textRequestBody.FromUserName,
-				"Hello, "+textRequestBody.FromUserName)
-			if err != nil {
-				log.Println("Wechat Service: makeTextResponseBody error: ", err)
-				return
+			if "event" == textRequestBody.MsgType && "subscribe" == textRequestBody.Event {
+				resp, err := makeWelcomeResponseBody(textRequestBody.ToUserName, textRequestBody.FromUserName)
+				if err != nil {
+					log.Println("Wechat Service: makeTextResponseBody error: ", err)
+					return
+				}
+				fmt.Fprintf(w, string(resp))
+			} else {
+				responseTextBody, err := makeNewsResponseBody(textRequestBody.ToUserName,
+					textRequestBody.FromUserName,
+					"Hello, "+textRequestBody.FromUserName)
+				if err != nil {
+					log.Println("Wechat Service: makeTextResponseBody error: ", err)
+					return
+				}
+				fmt.Fprintf(w, string(responseTextBody))
 			}
-			log.Println(string(responseTextBody))
-			fmt.Fprintf(w, string(responseTextBody))
 		}
 	}
 }
@@ -85,6 +94,10 @@ func makeTextResponseBody(fromUserName, toUserName, content string) ([]byte, err
 	textResponseBody.Content = content
 	textResponseBody.CreateTime = time.Duration(time.Now().Unix())
 	return xml.MarshalIndent(textResponseBody, " ", "  ")
+}
+
+func makeWelcomeResponseBody(fromUserName string, toUserName string) ([]byte, error) {
+	return makeTextResponseBody(fromUserName, toUserName, "welcome")
 }
 
 func makeNewsResponseBody(fromUserName, toUserName, content string) ([]byte, error) {
@@ -153,6 +166,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	initCheck()
 	createWxMenu()
 	http.HandleFunc("/", procRequest)
 	http.HandleFunc("/status", healthHandler)
