@@ -21,7 +21,7 @@ func getAccessToken() string {
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		log.Println("search query failed: %s", resp.Status)
+		log.Printf("search query failed: %s\n", resp.Status)
 		return ""
 	}
 

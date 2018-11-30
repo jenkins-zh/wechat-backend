@@ -17,17 +17,6 @@ const (
 	token = "wechat4go"
 )
 
-type TextRequestBody struct {
-	XMLName      xml.Name `xml:"xml"`
-	ToUserName   string
-	FromUserName string
-	CreateTime   time.Duration
-	MsgType      string
-	Content      string
-	MsgId        int
-	Event        string
-}
-
 func makeSignature(timestamp, nonce string) string {
 	sl := []string{token, timestamp, nonce}
 	sort.Strings(sl)
@@ -73,6 +62,26 @@ func procRequest(w http.ResponseWriter, r *http.Request) {
 				}
 				fmt.Fprintf(w, string(resp))
 			} else {
+				keyword := textRequestBody.Content
+				fmt.Println(textRequestBody.MsgType, keyword, respMap)
+				if "text" == textRequestBody.MsgType {
+					if resp, ok := respMap[keyword]; ok {
+						if text, ok := resp.(TextResponseBody); ok {
+							textResp, err := makeTextResponseBody(textRequestBody.ToUserName, textRequestBody.FromUserName, text.Content)
+							if err != nil {
+								log.Println("Wechat Service: makeTextResponseBody error: ", err)
+								return
+							}
+							fmt.Fprintf(w, string(textResp))
+							return
+						} else {
+							log.Println("type error", ok)
+						}
+					} else {
+						log.Printf("can't find keyword %s\n", keyword)
+					}
+				}
+
 				responseTextBody, err := makeNewsResponseBody(textRequestBody.ToUserName,
 					textRequestBody.FromUserName,
 					"Hello, "+textRequestBody.FromUserName)
@@ -116,37 +125,6 @@ func makeNewsResponseBody(fromUserName, toUserName, content string) ([]byte, err
 	}
 	newsResponseBody.CreateTime = time.Duration(time.Now().Unix())
 	return xml.MarshalIndent(newsResponseBody, " ", "  ")
-}
-
-type TextResponseBody struct {
-	XMLName      xml.Name `xml:"xml"`
-	ToUserName   string
-	FromUserName string
-	CreateTime   time.Duration
-	MsgType      string
-	Content      string
-}
-
-type NewsResponseBody struct {
-	XMLName      xml.Name `xml:"xml"`
-	ToUserName   string
-	FromUserName string
-	CreateTime   time.Duration
-	MsgType      string
-	ArticleCount int
-	Articles     Articles
-}
-
-type Articles struct {
-	XMLName  xml.Name  `xml:"Articles"`
-	Articles []Article `xml:"item"`
-}
-
-type Article struct {
-	Title       string
-	Description string
-	PicUrl      string
-	Url         string
 }
 
 func parseTextRequestBody(r *http.Request) *TextRequestBody {
