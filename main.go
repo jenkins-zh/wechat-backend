@@ -146,8 +146,10 @@ func handler(w http.ResponseWriter, r *http.Request) {
 func main() {
 	initCheck()
 	createWxMenu()
+
 	http.HandleFunc("/", procRequest)
 	http.HandleFunc("/status", healthHandler)
+	http.HandleFunc("/webhook", webhookHandler)
 
 	log.Fatal(http.ListenAndServe(":18080", nil))
 }
