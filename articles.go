@@ -68,6 +68,32 @@ func initCheck() {
 
 var respMap = make(map[string]interface{})
 
+func responseHandler(yamlContent []byte) {
+	reps := ResponseBody{}
+	err := yaml.Unmarshal(yamlContent, &reps)
+	if err == nil {
+		log.Println(reps.Kind, reps.Keyword, reps)
+		reps.MsgType = reps.Kind
+
+		switch reps.Kind {
+		case "text":
+			text := TextResponseBody{}
+			yaml.Unmarshal(yamlContent, &text)
+			respMap[reps.Keyword] = text
+		case "image":
+			image := ImageResponseBody{}
+			yaml.Unmarshal(yamlContent, &image)
+			respMap[reps.Keyword] = image
+		case "news":
+			news := NewsResponseBody{}
+			yaml.Unmarshal(yamlContent, &news)
+			respMap[reps.Keyword] = news
+		}
+	} else {
+		fmt.Println(err)
+	}
+}
+
 func update() {
 	root := CONFIG + "/management/auto-reply"
 	files, err := ioutil.ReadDir(root)
@@ -82,25 +108,7 @@ func update() {
 
 		content, err := ioutil.ReadFile(root + "/" + file.Name())
 		if err == nil {
-			reps := ResponseBody{}
-			err = yaml.Unmarshal([]byte(content), &reps)
-			if err == nil {
-				log.Println(reps.Kind, reps.Keyword, reps)
-				reps.MsgType = reps.Kind
-
-				switch reps.Kind {
-				case "text":
-					text := TextResponseBody{}
-					yaml.Unmarshal([]byte(content), &text)
-					log.Println(text)
-
-					respMap[reps.Keyword] = text
-				case "image":
-				case "link":
-				}
-			} else {
-				fmt.Println(err)
-			}
+			responseHandler(content)
 		} else {
 			log.Println("Can't read file ", file.Name())
 		}

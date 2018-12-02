@@ -74,6 +74,24 @@ func procRequest(w http.ResponseWriter, r *http.Request) {
 							}
 							fmt.Fprintf(w, string(textResp))
 							return
+						} else if image, ok := resp.(ImageResponseBody); ok {
+							imageResp, err := makeImageResponseBody(textRequestBody.ToUserName, textRequestBody.FromUserName, image.Image.MediaID)
+							if err != nil {
+								log.Println("Wechat Service: makeTextResponseBody error: ", err)
+								return
+							}
+							log.Println("response", string(imageResp))
+							fmt.Fprintf(w, string(imageResp))
+							return
+						} else if news, ok := resp.(NewsResponseBody); ok {
+							newsResp, err := makeNewsResponseBody(textRequestBody.ToUserName, textRequestBody.FromUserName, news)
+							if err != nil {
+								log.Println("Wechat Service: makeNewsResponseBody error: ", err)
+								return
+							}
+							log.Println("response", string(newsResp))
+							fmt.Fprintf(w, string(newsResp))
+							return
 						} else {
 							log.Println("type error", ok)
 						}
@@ -81,15 +99,6 @@ func procRequest(w http.ResponseWriter, r *http.Request) {
 						log.Printf("can't find keyword %s\n", keyword)
 					}
 				}
-
-				responseTextBody, err := makeNewsResponseBody(textRequestBody.ToUserName,
-					textRequestBody.FromUserName,
-					"Hello, "+textRequestBody.FromUserName)
-				if err != nil {
-					log.Println("Wechat Service: makeTextResponseBody error: ", err)
-					return
-				}
-				fmt.Fprintf(w, string(responseTextBody))
 			}
 		}
 	}
@@ -105,23 +114,30 @@ func makeTextResponseBody(fromUserName, toUserName, content string) ([]byte, err
 	return xml.MarshalIndent(textResponseBody, " ", "  ")
 }
 
+func makeImageResponseBody(fromUserName, toUserName, mediaID string) ([]byte, error) {
+	imageResponseBody := &ImageResponseBody{}
+	imageResponseBody.FromUserName = fromUserName
+	imageResponseBody.ToUserName = toUserName
+	imageResponseBody.MsgType = "image"
+	imageResponseBody.CreateTime = time.Duration(time.Now().Unix())
+	imageResponseBody.Image = Image{
+		MediaID: mediaID,
+	}
+	return xml.MarshalIndent(imageResponseBody, " ", "  ")
+}
+
 func makeWelcomeResponseBody(fromUserName string, toUserName string) ([]byte, error) {
 	return makeTextResponseBody(fromUserName, toUserName, "welcome")
 }
 
-func makeNewsResponseBody(fromUserName, toUserName, content string) ([]byte, error) {
+func makeNewsResponseBody(fromUserName, toUserName string, news NewsResponseBody) ([]byte, error) {
 	newsResponseBody := &NewsResponseBody{}
 	newsResponseBody.FromUserName = fromUserName
 	newsResponseBody.ToUserName = toUserName
 	newsResponseBody.MsgType = "news"
 	newsResponseBody.ArticleCount = 1
 	newsResponseBody.Articles = Articles{
-		Articles: []Article{{
-			Title:       "来自 Jenkins 官方的消息",
-			Description: "来自 Jenkins 官方的消息",
-			PicUrl:      "https://raw.githubusercontent.com/jenkins-infra/wechat/master/images/vscode-pipeline-linter/example1.gif",
-			Url:         "https://mp.weixin.qq.com/s/4pktvfQ3tJZgqY--VgNgZQ",
-		}},
+		Articles: news.Articles.Articles,
 	}
 	newsResponseBody.CreateTime = time.Duration(time.Now().Unix())
 	return xml.MarshalIndent(newsResponseBody, " ", "  ")
