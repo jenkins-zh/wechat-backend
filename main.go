@@ -11,6 +11,8 @@ import (
 	"sort"
 	"strings"
 	"time"
+
+	"github.com/linuxsuren/wechat-backend/config"
 )
 
 const (
@@ -47,57 +49,68 @@ func procRequest(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Println("Wechat Service: validateUrl Ok!")
 
-	if r.Method == "POST" {
-		textRequestBody := parseTextRequestBody(r)
-		if textRequestBody != nil {
-			fmt.Printf("Wechat Service: Recv text msg [%s] from user [%s]!",
-				textRequestBody.Content,
-				textRequestBody.FromUserName)
+	switch r.Method {
+	case "POST":
+		wechatRequest(w, r)
+	case "GET":
+		normalRequest(w, r)
+	}
+}
 
-			if "event" == textRequestBody.MsgType && "subscribe" == textRequestBody.Event {
-				resp, err := makeWelcomeResponseBody(textRequestBody.ToUserName, textRequestBody.FromUserName)
-				if err != nil {
-					log.Println("Wechat Service: makeTextResponseBody error: ", err)
-					return
-				}
-				fmt.Fprintf(w, string(resp))
-			} else {
-				keyword := textRequestBody.Content
-				fmt.Println(textRequestBody.MsgType, keyword, respMap)
-				if "text" == textRequestBody.MsgType {
-					if resp, ok := respMap[keyword]; ok {
-						if text, ok := resp.(TextResponseBody); ok {
-							textResp, err := makeTextResponseBody(textRequestBody.ToUserName, textRequestBody.FromUserName, text.Content)
-							if err != nil {
-								log.Println("Wechat Service: makeTextResponseBody error: ", err)
-								return
-							}
-							fmt.Fprintf(w, string(textResp))
+func normalRequest(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "welcome aboard.")
+}
+
+func wechatRequest(w http.ResponseWriter, r *http.Request) {
+	textRequestBody := parseTextRequestBody(r)
+	if textRequestBody != nil {
+		fmt.Printf("Wechat Service: Recv text msg [%s] from user [%s]!",
+			textRequestBody.Content,
+			textRequestBody.FromUserName)
+
+		if "event" == textRequestBody.MsgType && "subscribe" == textRequestBody.Event {
+			resp, err := makeWelcomeResponseBody(textRequestBody.ToUserName, textRequestBody.FromUserName)
+			if err != nil {
+				log.Println("Wechat Service: makeTextResponseBody error: ", err)
+				return
+			}
+			fmt.Fprintf(w, string(resp))
+		} else {
+			keyword := textRequestBody.Content
+			fmt.Println(textRequestBody.MsgType, keyword, respMap)
+			if "text" == textRequestBody.MsgType {
+				if resp, ok := respMap[keyword]; ok {
+					if text, ok := resp.(TextResponseBody); ok {
+						textResp, err := makeTextResponseBody(textRequestBody.ToUserName, textRequestBody.FromUserName, text.Content)
+						if err != nil {
+							log.Println("Wechat Service: makeTextResponseBody error: ", err)
 							return
-						} else if image, ok := resp.(ImageResponseBody); ok {
-							imageResp, err := makeImageResponseBody(textRequestBody.ToUserName, textRequestBody.FromUserName, image.Image.MediaID)
-							if err != nil {
-								log.Println("Wechat Service: makeTextResponseBody error: ", err)
-								return
-							}
-							log.Println("response", string(imageResp))
-							fmt.Fprintf(w, string(imageResp))
-							return
-						} else if news, ok := resp.(NewsResponseBody); ok {
-							newsResp, err := makeNewsResponseBody(textRequestBody.ToUserName, textRequestBody.FromUserName, news)
-							if err != nil {
-								log.Println("Wechat Service: makeNewsResponseBody error: ", err)
-								return
-							}
-							log.Println("response", string(newsResp))
-							fmt.Fprintf(w, string(newsResp))
-							return
-						} else {
-							log.Println("type error", ok)
 						}
+						fmt.Fprintf(w, string(textResp))
+						return
+					} else if image, ok := resp.(ImageResponseBody); ok {
+						imageResp, err := makeImageResponseBody(textRequestBody.ToUserName, textRequestBody.FromUserName, image.Image.MediaID)
+						if err != nil {
+							log.Println("Wechat Service: makeTextResponseBody error: ", err)
+							return
+						}
+						log.Println("response", string(imageResp))
+						fmt.Fprintf(w, string(imageResp))
+						return
+					} else if news, ok := resp.(NewsResponseBody); ok {
+						newsResp, err := makeNewsResponseBody(textRequestBody.ToUserName, textRequestBody.FromUserName, news)
+						if err != nil {
+							log.Println("Wechat Service: makeNewsResponseBody error: ", err)
+							return
+						}
+						log.Println("response", string(newsResp))
+						fmt.Fprintf(w, string(newsResp))
+						return
 					} else {
-						log.Printf("can't find keyword %s\n", keyword)
+						log.Println("type error", ok)
 					}
+				} else {
+					log.Printf("can't find keyword %s\n", keyword)
 				}
 			}
 		}
@@ -160,6 +173,8 @@ func handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	config.LoadConfig("")
+
 	initCheck()
 	createWxMenu()
 
