@@ -8,6 +8,7 @@ import (
 
 	"strings"
 
+	"github.com/linuxsuren/wechat-backend/config"
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/yaml.v2"
 )
@@ -16,14 +17,14 @@ const (
 	CONFIG = "wechat"
 )
 
-func initCheck() {
+func initCheck(weConfig *config.WeChatConfig) {
 	var err error
 
 	_, err = os.Stat(CONFIG)
 	if err != nil {
 		if os.IsNotExist(err) {
 			_, err = git.PlainClone(CONFIG, false, &git.CloneOptions{
-				URL:      "https://github.com/LinuxSuRen/jenkins.wechat",
+				URL:      weConfig.GitURL,
 				Progress: os.Stdout,
 			})
 			if err != nil {
@@ -45,19 +46,19 @@ func initCheck() {
 				} else {
 					log.Println("open work tree with git error", err)
 					os.Remove(CONFIG)
-					initCheck()
+					initCheck(weConfig)
 				}
 			} else {
 				log.Println("open dir with git error", err)
 				os.Remove(CONFIG)
-				initCheck()
+				initCheck(weConfig)
 			}
 		}
 	} else {
 		log.Println("can't get config dir status", err)
 
 		if os.RemoveAll(CONFIG) == nil {
-			initCheck()
+			initCheck(weConfig)
 		}
 	}
 
@@ -113,10 +114,6 @@ func update() {
 			log.Println("Can't read file ", file.Name())
 		}
 	}
-}
-
-func getWelcome() string {
-	return ""
 }
 
 func getKeywords() map[string]string {

@@ -9,10 +9,12 @@ import (
 
 // WeChatConfig represents WeChat config
 type WeChatConfig struct {
-	GitURL              string
-	GitBranch           string
-	Token               string
-	GitHubWebHookSecret string
+	GitURL              string `yaml:"git_url"`
+	GitBranch           string `yaml:"git_branch"`
+	Token               string `yaml:"token"`
+	GitHubWebHookSecret string `yaml:"github_webhook_secret"`
+
+	ServerPort int `yaml:"server_port"`
 }
 
 // LoadConfig load config
@@ -29,4 +31,5 @@ func LoadConfig(configFile string) (config *WeChatConfig, err error) {
 	if err != nil {
 		log.Printf("parse config file error: %v\n", err)
 	}
+	return
 }

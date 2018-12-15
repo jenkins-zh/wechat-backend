@@ -1,13 +1,14 @@
-package main
+package github
 
 import (
 	"log"
 	"net/http"
 
+	"github.com/linuxsuren/wechat-backend/config"
 	"gopkg.in/go-playground/webhooks.v5/github"
 )
 
-func webhookHandler(w http.ResponseWriter, r *http.Request) {
+func WebhookHandler(w http.ResponseWriter, r *http.Request, weConfig *config.WeChatConfig, initCheck func(*config.WeChatConfig)) {
 	hook, _ := github.New(github.Options.Secret("secret"))
 
 	payload, err := hook.Parse(r, github.PushEvent)
@@ -30,5 +31,5 @@ func webhookHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Println("Going to update wechat config.")
-	initCheck()
+	initCheck(weConfig)
 }

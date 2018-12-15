@@ -13,24 +13,26 @@ import (
 	"time"
 
 	"github.com/linuxsuren/wechat-backend/config"
+	"github.com/linuxsuren/wechat-backend/github"
 )
 
-const (
-	token = "wechat4go"
-)
+// WeChat represents WeChat
+type WeChat struct {
+	Config *config.WeChatConfig
+}
 
-func makeSignature(timestamp, nonce string) string {
-	sl := []string{token, timestamp, nonce}
+func (w *WeChat) makeSignature(timestamp, nonce string) string {
+	sl := []string{w.Config.Token, timestamp, nonce}
 	sort.Strings(sl)
 	s := sha1.New()
 	io.WriteString(s, strings.Join(sl, ""))
 	return fmt.Sprintf("%x", s.Sum(nil))
 }
 
-func validateUrl(w http.ResponseWriter, r *http.Request) bool {
+func (we *WeChat) validateUrl(w http.ResponseWriter, r *http.Request) bool {
 	timestamp := strings.Join(r.Form["timestamp"], "")
 	nonce := strings.Join(r.Form["nonce"], "")
-	signatureGen := makeSignature(timestamp, nonce)
+	signatureGen := we.makeSignature(timestamp, nonce)
 
 	signatureIn := strings.Join(r.Form["signature"], "")
 	if signatureGen != signatureIn {
@@ -41,9 +43,9 @@ func validateUrl(w http.ResponseWriter, r *http.Request) bool {
 	return true
 }
 
-func procRequest(w http.ResponseWriter, r *http.Request) {
+func (we *WeChat) procRequest(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
-	if !validateUrl(w, r) {
+	if !we.validateUrl(w, r) {
 		log.Println("Wechat Service: this http request is not from Wechat platform!")
 		return
 	}
@@ -51,73 +53,70 @@ func procRequest(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case "POST":
-		wechatRequest(w, r)
+		we.wechatRequest(w, r)
 	case "GET":
-		normalRequest(w, r)
+		we.normalRequest(w, r)
 	}
 }
 
-func normalRequest(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "welcome aboard.")
+func (we *WeChat) normalRequest(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("welcome aboard WeChat."))
 }
 
-func wechatRequest(w http.ResponseWriter, r *http.Request) {
-	textRequestBody := parseTextRequestBody(r)
+func (we *WeChat) wechatRequest(w http.ResponseWriter, r *http.Request) {
+	textRequestBody := we.parseTextRequestBody(r)
 	if textRequestBody != nil {
 		fmt.Printf("Wechat Service: Recv text msg [%s] from user [%s]!",
 			textRequestBody.Content,
 			textRequestBody.FromUserName)
 
 		if "event" == textRequestBody.MsgType && "subscribe" == textRequestBody.Event {
-			resp, err := makeWelcomeResponseBody(textRequestBody.ToUserName, textRequestBody.FromUserName)
+			resp, err := we.replyResponse("welcome", textRequestBody.ToUserName, textRequestBody.FromUserName)
 			if err != nil {
-				log.Println("Wechat Service: makeTextResponseBody error: ", err)
-				return
+				log.Println("handle welcome replay error:", err)
+			} else {
+				fmt.Fprintf(w, string(resp))
 			}
-			fmt.Fprintf(w, string(resp))
 		} else {
 			keyword := textRequestBody.Content
 			fmt.Println(textRequestBody.MsgType, keyword, respMap)
 			if "text" == textRequestBody.MsgType {
-				if resp, ok := respMap[keyword]; ok {
-					if text, ok := resp.(TextResponseBody); ok {
-						textResp, err := makeTextResponseBody(textRequestBody.ToUserName, textRequestBody.FromUserName, text.Content)
-						if err != nil {
-							log.Println("Wechat Service: makeTextResponseBody error: ", err)
-							return
-						}
-						fmt.Fprintf(w, string(textResp))
-						return
-					} else if image, ok := resp.(ImageResponseBody); ok {
-						imageResp, err := makeImageResponseBody(textRequestBody.ToUserName, textRequestBody.FromUserName, image.Image.MediaID)
-						if err != nil {
-							log.Println("Wechat Service: makeTextResponseBody error: ", err)
-							return
-						}
-						log.Println("response", string(imageResp))
-						fmt.Fprintf(w, string(imageResp))
-						return
-					} else if news, ok := resp.(NewsResponseBody); ok {
-						newsResp, err := makeNewsResponseBody(textRequestBody.ToUserName, textRequestBody.FromUserName, news)
-						if err != nil {
-							log.Println("Wechat Service: makeNewsResponseBody error: ", err)
-							return
-						}
-						log.Println("response", string(newsResp))
-						fmt.Fprintf(w, string(newsResp))
-						return
-					} else {
-						log.Println("type error", ok)
-					}
+				resp, err := we.replyResponse(keyword, textRequestBody.ToUserName, textRequestBody.FromUserName)
+				if err != nil {
+					log.Println("handle auto replay error:", err)
 				} else {
-					log.Printf("can't find keyword %s\n", keyword)
+					fmt.Fprintf(w, string(resp))
 				}
 			}
 		}
 	}
 }
 
-func makeTextResponseBody(fromUserName, toUserName, content string) ([]byte, error) {
+func (we *WeChat) replyResponse(keyword string, from string, to string) (data []byte, err error) {
+	if resp, ok := respMap[keyword]; ok {
+		if text, ok := resp.(TextResponseBody); ok {
+			data, err = we.makeTextResponseBody(from, to, text.Content)
+			if err != nil {
+				err = fmt.Errorf("Wechat Service: makeTextResponseBody error: %v", err)
+			}
+		} else if image, ok := resp.(ImageResponseBody); ok {
+			data, err = we.makeImageResponseBody(from, to, image.Image.MediaID)
+			if err != nil {
+				err = fmt.Errorf("Wechat Service: makeImageResponseBody error: %v", err)
+			}
+		} else if news, ok := resp.(NewsResponseBody); ok {
+			data, err = we.makeNewsResponseBody(from, to, news)
+			if err != nil {
+				err = fmt.Errorf("Wechat Service: makeNewsResponseBody error: %v", err)
+			}
+		} else {
+			err = fmt.Errorf("type error")
+		}
+	}
+	return
+}
+
+func (w *WeChat) makeTextResponseBody(fromUserName, toUserName, content string) ([]byte, error) {
 	textResponseBody := &TextResponseBody{}
 	textResponseBody.FromUserName = fromUserName
 	textResponseBody.ToUserName = toUserName
@@ -127,7 +126,7 @@ func makeTextResponseBody(fromUserName, toUserName, content string) ([]byte, err
 	return xml.MarshalIndent(textResponseBody, " ", "  ")
 }
 
-func makeImageResponseBody(fromUserName, toUserName, mediaID string) ([]byte, error) {
+func (w *WeChat) makeImageResponseBody(fromUserName, toUserName, mediaID string) ([]byte, error) {
 	imageResponseBody := &ImageResponseBody{}
 	imageResponseBody.FromUserName = fromUserName
 	imageResponseBody.ToUserName = toUserName
@@ -139,11 +138,7 @@ func makeImageResponseBody(fromUserName, toUserName, mediaID string) ([]byte, er
 	return xml.MarshalIndent(imageResponseBody, " ", "  ")
 }
 
-func makeWelcomeResponseBody(fromUserName string, toUserName string) ([]byte, error) {
-	return makeTextResponseBody(fromUserName, toUserName, "welcome")
-}
-
-func makeNewsResponseBody(fromUserName, toUserName string, news NewsResponseBody) ([]byte, error) {
+func (w *WeChat) makeNewsResponseBody(fromUserName, toUserName string, news NewsResponseBody) ([]byte, error) {
 	newsResponseBody := &NewsResponseBody{}
 	newsResponseBody.FromUserName = fromUserName
 	newsResponseBody.ToUserName = toUserName
@@ -156,7 +151,7 @@ func makeNewsResponseBody(fromUserName, toUserName string, news NewsResponseBody
 	return xml.MarshalIndent(newsResponseBody, " ", "  ")
 }
 
-func parseTextRequestBody(r *http.Request) *TextRequestBody {
+func (w *WeChat) parseTextRequestBody(r *http.Request) *TextRequestBody {
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		log.Fatal(err)
@@ -168,19 +163,29 @@ func parseTextRequestBody(r *http.Request) *TextRequestBody {
 	return requestBody
 }
 
-func handler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hi there, I love %s!", r.URL.Path[1:])
-}
-
 func main() {
-	config.LoadConfig("")
+	weConfig, err := config.LoadConfig("config/wechat.yaml")
+	if err != nil {
+		log.Printf("load config error %v\n", err)
+	}
 
-	initCheck()
+	if weConfig.ServerPort <= 0 {
+		weConfig.ServerPort = 8080
+	}
+
+	wechat := WeChat{
+		Config: weConfig,
+	}
+	go func() {
+		initCheck(weConfig)
+	}()
 	createWxMenu()
 
-	http.HandleFunc("/", procRequest)
+	http.HandleFunc("/", wechat.procRequest)
 	http.HandleFunc("/status", healthHandler)
-	http.HandleFunc("/webhook", webhookHandler)
+	http.HandleFunc("/webhook", func(w http.ResponseWriter, r *http.Request) {
+		github.WebhookHandler(w, r, weConfig, initCheck)
+	})
 
-	log.Fatal(http.ListenAndServe(":18080", nil))
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", weConfig.ServerPort), nil))
 }
