@@ -52,9 +52,9 @@ func (we *WeChat) procRequest(w http.ResponseWriter, r *http.Request) {
 	log.Println("Wechat Service: validateUrl Ok!")
 
 	switch r.Method {
-	case "POST":
+	case http.MethodPost:
 		we.wechatRequest(w, r)
-	case "GET":
+	case http.MethodGet:
 		we.normalRequest(w, r)
 	}
 }

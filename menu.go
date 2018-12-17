@@ -15,7 +15,6 @@ func PushWxMenuCreate(accessToken string, menuJsonBytes []byte) error {
 		bytes.NewReader(menuJsonBytes))
 
 	if err != nil {
-		fmt.Println("向微信发送菜单建立请求失败", err)
 		log.Println("向微信发送菜单建立请求失败", err)
 		return err
 	}
@@ -24,14 +23,13 @@ func PushWxMenuCreate(accessToken string, menuJsonBytes []byte) error {
 
 	client := &http.Client{}
 	resp, err := client.Do(postReq)
+	defer resp.Body.Close()
 	if err != nil {
-		fmt.Println("client向微信发送菜单建立请求失败", err)
 		log.Println("client向微信发送菜单建立请求失败", err)
 		return err
-	} else {
-		fmt.Println("向微信发送菜单建立成功")
 	}
-	defer resp.Body.Close()
+
+	log.Println("向微信发送菜单建立成功")
 
 	return nil
 }
