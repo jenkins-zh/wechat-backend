@@ -9,8 +9,7 @@ import (
 )
 
 func PushWxMenuCreate(accessToken string, menuJsonBytes []byte) error {
-
-	postReq, err := http.NewRequest("POST",
+	postReq, err := http.NewRequest(http.MethodPost,
 		strings.Join([]string{"https://api.weixin.qq.com/cgi-bin/menu/create", "?access_token=", accessToken}, ""),
 		bytes.NewReader(menuJsonBytes))
 
@@ -23,12 +22,12 @@ func PushWxMenuCreate(accessToken string, menuJsonBytes []byte) error {
 
 	client := &http.Client{}
 	resp, err := client.Do(postReq)
-	defer resp.Body.Close()
 	if err != nil {
 		log.Println("client向微信发送菜单建立请求失败", err)
 		return err
 	}
 
+	defer resp.Body.Close()
 	log.Println("向微信发送菜单建立成功")
 
 	return nil
