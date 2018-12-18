@@ -12,8 +12,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/linuxsuren/wechat-backend/config"
-	"github.com/linuxsuren/wechat-backend/github"
+	"github.com/linuxsuren/wechat-backend/pkg/config"
+	"github.com/linuxsuren/wechat-backend/pkg/github"
 )
 
 // WeChat represents WeChat

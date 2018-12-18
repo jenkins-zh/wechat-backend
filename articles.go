@@ -8,7 +8,7 @@ import (
 
 	"strings"
 
-	"github.com/linuxsuren/wechat-backend/config"
+	"github.com/linuxsuren/wechat-backend/pkg/config"
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/yaml.v2"
 )
