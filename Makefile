@@ -4,6 +4,8 @@ build:
 
 image: build
 	docker build -t surenpi/jenkins-wechat .
+
+push-image:
 	docker push surenpi/jenkins-wechat
 
 image-ubuntu: build
@@ -13,3 +15,11 @@ image-ubuntu: build
 init-mock-dep:
 	go get github.com/golang/mock/gomock
 	go install github.com/golang/mock/mockgen
+
+update:
+	kubectl set image deploy/wechat wechat=surenpi/jenkins-wechat
+	make restart
+
+restart:
+	kubectl scale deploy/wechat --replicas=0
+	kubectl scale deploy/wechat --replicas=1
