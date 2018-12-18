@@ -169,6 +169,12 @@ func main() {
 		log.Printf("load config error %v\n", err)
 	}
 
+	if weConfig == nil {
+		weConfig = &config.WeChatConfig{
+			ServerPort: 8080,
+		}
+	}
+
 	if weConfig.ServerPort <= 0 {
 		weConfig.ServerPort = 8080
 	}
