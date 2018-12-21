@@ -5,7 +5,7 @@ build:
 image: build
 	docker build -t surenpi/jenkins-wechat .
 
-push-image:
+push-image: image
 	docker push surenpi/jenkins-wechat
 
 image-ubuntu: build

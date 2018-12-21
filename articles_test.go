@@ -13,7 +13,6 @@ import (
 func TestImageResponseBody(t *testing.T) {
 	yml := `
 msgType: image
-kind: image
 
 keyword: hi
 content: say hello from jenkins.
@@ -37,7 +36,6 @@ image:
 
 func TestNewsResponseBody(t *testing.T) {
 	yml := `
-kind: news
 keyword: about
 
 msgType: news

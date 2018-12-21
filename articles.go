@@ -63,6 +63,7 @@ func initCheck(weConfig *config.WeChatConfig) {
 	}
 
 	if err == nil {
+		log.Println("going to update the cache.")
 		update()
 	}
 }
@@ -73,10 +74,10 @@ func responseHandler(yamlContent []byte) {
 	reps := ResponseBody{}
 	err := yaml.Unmarshal(yamlContent, &reps)
 	if err == nil {
-		log.Println(reps.Kind, reps.Keyword, reps)
-		reps.MsgType = reps.Kind
+		log.Println(reps.MsgType, reps.Keyword, reps)
+		// reps.MsgType = reps.Kind
 
-		switch reps.Kind {
+		switch reps.MsgType {
 		case "text":
 			text := TextResponseBody{}
 			yaml.Unmarshal(yamlContent, &text)
@@ -89,6 +90,8 @@ func responseHandler(yamlContent []byte) {
 			news := NewsResponseBody{}
 			yaml.Unmarshal(yamlContent, &news)
 			respMap[reps.Keyword] = news
+		default:
+			log.Println("unknow type", reps.MsgType)
 		}
 	} else {
 		fmt.Println(err)

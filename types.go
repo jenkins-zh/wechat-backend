@@ -18,7 +18,6 @@ type TextRequestBody struct {
 
 type ResponseBody struct {
 	Keyword string `json:"keyword"`
-	Kind    string `json:"kind"`
 
 	MsgType      string `json:"msgType" yaml:"msgType" xml:"MsgType"`
 	ToUserName   string

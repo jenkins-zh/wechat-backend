@@ -66,7 +66,8 @@ func (we *WeChat) normalRequest(w http.ResponseWriter, r *http.Request) {
 func (we *WeChat) wechatRequest(w http.ResponseWriter, r *http.Request) {
 	textRequestBody := we.parseTextRequestBody(r)
 	if textRequestBody != nil {
-		fmt.Printf("Wechat Service: Recv text msg [%s] from user [%s]!",
+		fmt.Printf("Wechat Service: Recv [%s] msg [%s] from user [%s]!\n",
+			textRequestBody.MsgType,
 			textRequestBody.Content,
 			textRequestBody.FromUserName)
 
@@ -79,12 +80,13 @@ func (we *WeChat) wechatRequest(w http.ResponseWriter, r *http.Request) {
 			}
 		} else {
 			keyword := textRequestBody.Content
-			fmt.Println(textRequestBody.MsgType, keyword, respMap)
+			log.Println(textRequestBody.MsgType, keyword, respMap)
 			if "text" == textRequestBody.MsgType {
 				resp, err := we.replyResponse(keyword, textRequestBody.ToUserName, textRequestBody.FromUserName)
 				if err != nil {
 					log.Println("handle auto replay error:", err)
 				} else {
+					log.Println("response", string(resp))
 					fmt.Fprintf(w, string(resp))
 				}
 			}
