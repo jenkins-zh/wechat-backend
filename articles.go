@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/linuxsuren/wechat-backend/pkg/config"
+	"github.com/linuxsuren/wechat-backend/pkg/reply"
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/yaml.v2"
 )
@@ -71,7 +72,7 @@ func initCheck(weConfig *config.WeChatConfig) {
 var respMap = make(map[string]interface{})
 
 func responseHandler(yamlContent []byte) {
-	reps := ResponseBody{}
+	reps := reply.ResponseBody{}
 	err := yaml.Unmarshal(yamlContent, &reps)
 	if err == nil {
 		log.Println(reps.MsgType, reps.Keyword, reps)
@@ -79,15 +80,15 @@ func responseHandler(yamlContent []byte) {
 
 		switch reps.MsgType {
 		case "text":
-			text := TextResponseBody{}
+			text := reply.TextResponseBody{}
 			yaml.Unmarshal(yamlContent, &text)
 			respMap[reps.Keyword] = text
 		case "image":
-			image := ImageResponseBody{}
+			image := reply.ImageResponseBody{}
 			yaml.Unmarshal(yamlContent, &image)
 			respMap[reps.Keyword] = image
 		case "news":
-			news := NewsResponseBody{}
+			news := reply.NewsResponseBody{}
 			yaml.Unmarshal(yamlContent, &news)
 			respMap[reps.Keyword] = news
 		default:

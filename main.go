@@ -10,10 +10,10 @@ import (
 	"net/http"
 	"sort"
 	"strings"
-	"time"
 
 	"github.com/linuxsuren/wechat-backend/pkg/config"
 	"github.com/linuxsuren/wechat-backend/pkg/github"
+	"github.com/linuxsuren/wechat-backend/pkg/reply"
 )
 
 // WeChat represents WeChat
@@ -71,99 +71,36 @@ func (we *WeChat) wechatRequest(w http.ResponseWriter, r *http.Request) {
 			textRequestBody.Content,
 			textRequestBody.FromUserName)
 
-		if "event" == textRequestBody.MsgType && "subscribe" == textRequestBody.Event {
-			resp, err := we.replyResponse("welcome", textRequestBody.ToUserName, textRequestBody.FromUserName)
-			if err != nil {
-				log.Println("handle welcome replay error:", err)
-			} else {
-				fmt.Fprintf(w, string(resp))
+		for _, autoReplyInit := range autoReplyInitChains {
+			autoReply := autoReplyInit()
+			if !autoReply.Accept(textRequestBody) {
+				continue
 			}
-		} else {
-			keyword := textRequestBody.Content
-			log.Println(textRequestBody.MsgType, keyword, respMap)
-			if "text" == textRequestBody.MsgType {
-				resp, err := we.replyResponse(keyword, textRequestBody.ToUserName, textRequestBody.FromUserName)
-				if err != nil {
-					log.Println("handle auto replay error:", err)
-				} else {
-					log.Println("response", string(resp))
-					fmt.Fprintf(w, string(resp))
-				}
+
+			var data []byte
+			var err error
+			if data, err = autoReply.Handle(); err != nil {
+				log.Println("handle auto replay error:", err)
 			}
+			fmt.Fprintf(w, string(data))
+			break
 		}
 	}
 }
 
-func (we *WeChat) replyResponse(keyword string, from string, to string) (data []byte, err error) {
-	if resp, ok := respMap[keyword]; ok {
-		if text, ok := resp.(TextResponseBody); ok {
-			data, err = we.makeTextResponseBody(from, to, text.Content)
-			if err != nil {
-				err = fmt.Errorf("Wechat Service: makeTextResponseBody error: %v", err)
-			}
-		} else if image, ok := resp.(ImageResponseBody); ok {
-			data, err = we.makeImageResponseBody(from, to, image.Image.MediaID)
-			if err != nil {
-				err = fmt.Errorf("Wechat Service: makeImageResponseBody error: %v", err)
-			}
-		} else if news, ok := resp.(NewsResponseBody); ok {
-			data, err = we.makeNewsResponseBody(from, to, news)
-			if err != nil {
-				err = fmt.Errorf("Wechat Service: makeNewsResponseBody error: %v", err)
-			}
-		} else {
-			err = fmt.Errorf("type error")
-		}
-	}
-	return
-}
-
-func (w *WeChat) makeTextResponseBody(fromUserName, toUserName, content string) ([]byte, error) {
-	textResponseBody := &TextResponseBody{}
-	textResponseBody.FromUserName = fromUserName
-	textResponseBody.ToUserName = toUserName
-	textResponseBody.MsgType = "text"
-	textResponseBody.Content = content
-	textResponseBody.CreateTime = time.Duration(time.Now().Unix())
-	return xml.MarshalIndent(textResponseBody, " ", "  ")
-}
-
-func (w *WeChat) makeImageResponseBody(fromUserName, toUserName, mediaID string) ([]byte, error) {
-	imageResponseBody := &ImageResponseBody{}
-	imageResponseBody.FromUserName = fromUserName
-	imageResponseBody.ToUserName = toUserName
-	imageResponseBody.MsgType = "image"
-	imageResponseBody.CreateTime = time.Duration(time.Now().Unix())
-	imageResponseBody.Image = Image{
-		MediaID: mediaID,
-	}
-	return xml.MarshalIndent(imageResponseBody, " ", "  ")
-}
-
-func (w *WeChat) makeNewsResponseBody(fromUserName, toUserName string, news NewsResponseBody) ([]byte, error) {
-	newsResponseBody := &NewsResponseBody{}
-	newsResponseBody.FromUserName = fromUserName
-	newsResponseBody.ToUserName = toUserName
-	newsResponseBody.MsgType = "news"
-	newsResponseBody.ArticleCount = 1
-	newsResponseBody.Articles = Articles{
-		Articles: news.Articles.Articles,
-	}
-	newsResponseBody.CreateTime = time.Duration(time.Now().Unix())
-	return xml.MarshalIndent(newsResponseBody, " ", "  ")
-}
-
-func (w *WeChat) parseTextRequestBody(r *http.Request) *TextRequestBody {
+func (w *WeChat) parseTextRequestBody(r *http.Request) *reply.TextRequestBody {
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		log.Fatal(err)
 		return nil
 	}
 	fmt.Println(string(body))
-	requestBody := &TextRequestBody{}
+	requestBody := &reply.TextRequestBody{}
 	xml.Unmarshal(body, requestBody)
 	return requestBody
 }
+
+var autoReplyInitChains []reply.Init
 
 func main() {
 	weConfig, err := config.LoadConfig("config/wechat.yaml")
@@ -188,6 +125,9 @@ func main() {
 		initCheck(weConfig)
 	}()
 	createWxMenu()
+
+	autoReplyInitChains = make([]reply.Init, 1)
+	autoReplyInitChains = append(autoReplyInitChains, reply.InitMatchAutoReply)
 
 	http.HandleFunc("/", wechat.procRequest)
 	http.HandleFunc("/status", healthHandler)
