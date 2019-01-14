@@ -154,7 +154,7 @@ func yaml_emitter_set_width(emitter *yaml_emitter_t, width int) {
 	emitter.best_width = width
 }
 
-// Set if unescaped non-ASCII characters are allowed.
+// Set if string non-ASCII characters are allowed.
 func yaml_emitter_set_unicode(emitter *yaml_emitter_t, unicode bool) {
 	emitter.unicode = unicode
 }

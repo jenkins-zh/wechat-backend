@@ -1,14 +1,11 @@
-package main
+package article
 
 import (
 	"testing"
 
+	core "github.com/linuxsuren/wechat-backend/pkg"
 	"github.com/stretchr/testify/assert"
 )
-
-// func TestInitCheck(t *testing.T) {
-// 	initCheck()
-// }
 
 func TestImageResponseBody(t *testing.T) {
 	yml := `
@@ -27,7 +24,7 @@ image:
 		t.Error("Can't find response by keyword: hi.")
 	}
 
-	imageResp, ok := resp.(ImageResponseBody)
+	imageResp, ok := resp.(core.ImageResponseBody)
 	if !ok {
 		t.Error("Get the wrong type, should be ImageResponseBody.")
 	}
@@ -55,7 +52,7 @@ articles:
 		return
 	}
 
-	newsResp, ok := resp.(NewsResponseBody)
+	newsResp, ok := resp.(core.NewsResponseBody)
 	if !ok {
 		t.Error("Get the wrong type, should be NewsResponseBody.")
 	}

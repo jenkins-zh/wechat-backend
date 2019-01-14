@@ -5,8 +5,14 @@ build:
 image: build
 	docker build -t surenpi/jenkins-wechat .
 
+image-alauda: build
+	docker build -t index.alauda.cn/alaudak8s/jenkins-wechat .
+
 push-image: image
 	docker push surenpi/jenkins-wechat
+
+push-image-alauda: image-alauda
+	docker push index.alauda.cn/alaudak8s/jenkins-wechat
 
 image-ubuntu: build
 	docker build -t surenpi/jenkins-wechat:ubuntu . -f Dockerfile.ubuntu
@@ -18,6 +24,10 @@ init-mock-dep:
 
 update:
 	kubectl set image deploy/wechat wechat=surenpi/jenkins-wechat
+	make restart
+
+update-alauda:
+	kubectl set image deploy/wechat wechat=index.alauda.cn/alaudak8s/jenkins-wechat
 	make restart
 
 restart:

@@ -1,21 +1,30 @@
 package reply
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/golang/mock/gomock"
+	core "github.com/linuxsuren/wechat-backend/pkg"
+	mArticle "github.com/linuxsuren/wechat-backend/pkg/mock/article"
+)
 
 func TestAccept(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
 	var reply AutoReply
+	reply = &MatchAutoReply{}
 
-	reply = &MatchAutoReply{
-		ResponseMap: map[string]interface{}{
-			"hello": "",
-		},
-	}
-
-	if reply.Accept(&TextRequestBody{}) {
+	if reply.Accept(&core.TextRequestBody{}) {
 		t.Errorf("should not accept")
 	}
 
-	if !reply.Accept(&TextRequestBody{
+	m := mArticle.NewMockResponseManager(ctrl)
+	m.EXPECT().GetResponse("hello").
+		Return(&core.TextResponseBody{}, true)
+	SetResponseManager(m)
+
+	if !reply.Accept(&core.TextRequestBody{
+		MsgType: "text",
 		Content: "hello",
 	}) {
 		t.Errorf("should accept")
@@ -23,15 +32,22 @@ func TestAccept(t *testing.T) {
 }
 
 func TestHandle(t *testing.T) {
-	var reply AutoReply
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	reply := &MatchAutoReply{}
 
-	reply = &MatchAutoReply{
-		ResponseMap: map[string]interface{}{
-			"hello": TextResponseBody{},
-		},
-	}
+	m := mArticle.NewMockResponseManager(ctrl)
+	m.EXPECT().GetResponse("hello").
+		Return(core.TextResponseBody{
+			ResponseBody: core.ResponseBody{
+				MsgType: "text",
+			},
+			Content: "hello",
+		}, true)
 
-	if !reply.Accept(&TextRequestBody{
+	SetResponseManager(m)
+	if !reply.Accept(&core.TextRequestBody{
+		MsgType: "text",
 		Content: "hello",
 	}) {
 		t.Errorf("should accept")
@@ -42,5 +58,7 @@ func TestHandle(t *testing.T) {
 		t.Errorf("should not error %v", err)
 	} else if data == nil {
 		t.Errorf("not have data")
+	} else if string(data) != "hello" {
+		t.Errorf("got an error content: %s", string(data))
 	}
 }

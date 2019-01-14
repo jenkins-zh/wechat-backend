@@ -1,4 +1,4 @@
-package main
+package article
 
 import (
 	"fmt"
@@ -8,8 +8,8 @@ import (
 
 	"strings"
 
+	core "github.com/linuxsuren/wechat-backend/pkg"
 	"github.com/linuxsuren/wechat-backend/pkg/config"
-	"github.com/linuxsuren/wechat-backend/pkg/reply"
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/yaml.v2"
 )
@@ -18,7 +18,29 @@ const (
 	CONFIG = "wechat"
 )
 
-func initCheck(weConfig *config.WeChatConfig) {
+type ResponseManager interface {
+	GetResponse(string) (interface{}, bool)
+	InitCheck(weConfig *config.WeChatConfig)
+}
+
+type DefaultResponseManager struct {
+	ResponseMap map[string]interface{}
+}
+
+// NewDefaultResponseManager should always call this method to get a object
+func NewDefaultResponseManager() (mgr *DefaultResponseManager) {
+	mgr = &DefaultResponseManager{
+		ResponseMap: make(map[string]interface{}, 10),
+	}
+	return
+}
+
+func (drm *DefaultResponseManager) GetResponse(keyword string) (interface{}, bool) {
+	res, ok := drm.ResponseMap[keyword]
+	return res, ok
+}
+
+func (drm *DefaultResponseManager) InitCheck(weConfig *config.WeChatConfig) {
 	var err error
 
 	_, err = os.Stat(CONFIG)
@@ -47,50 +69,47 @@ func initCheck(weConfig *config.WeChatConfig) {
 				} else {
 					log.Println("open work tree with git error", err)
 					os.Remove(CONFIG)
-					initCheck(weConfig)
+					drm.InitCheck(weConfig)
 				}
 			} else {
 				log.Println("open dir with git error", err)
 				os.Remove(CONFIG)
-				initCheck(weConfig)
+				drm.InitCheck(weConfig)
 			}
 		}
 	} else {
 		log.Println("can't get config dir status", err)
 
 		if os.RemoveAll(CONFIG) == nil {
-			initCheck(weConfig)
+			drm.InitCheck(weConfig)
 		}
 	}
 
 	if err == nil {
 		log.Println("going to update the cache.")
-		update()
+		drm.update()
 	}
 }
 
-var respMap = make(map[string]interface{})
-
-func responseHandler(yamlContent []byte) {
-	reps := reply.ResponseBody{}
+func (drm *DefaultResponseManager) responseHandler(yamlContent []byte) {
+	reps := core.ResponseBody{}
 	err := yaml.Unmarshal(yamlContent, &reps)
 	if err == nil {
 		log.Println(reps.MsgType, reps.Keyword, reps)
-		// reps.MsgType = reps.Kind
 
 		switch reps.MsgType {
 		case "text":
-			text := reply.TextResponseBody{}
+			text := core.TextResponseBody{}
 			yaml.Unmarshal(yamlContent, &text)
-			respMap[reps.Keyword] = text
+			drm.ResponseMap[reps.Keyword] = text
 		case "image":
-			image := reply.ImageResponseBody{}
+			image := core.ImageResponseBody{}
 			yaml.Unmarshal(yamlContent, &image)
-			respMap[reps.Keyword] = image
+			drm.ResponseMap[reps.Keyword] = image
 		case "news":
-			news := reply.NewsResponseBody{}
+			news := core.NewsResponseBody{}
 			yaml.Unmarshal(yamlContent, &news)
-			respMap[reps.Keyword] = news
+			drm.ResponseMap[reps.Keyword] = news
 		default:
 			log.Println("unknow type", reps.MsgType)
 		}
@@ -99,7 +118,7 @@ func responseHandler(yamlContent []byte) {
 	}
 }
 
-func update() {
+func (drm *DefaultResponseManager) update() {
 	root := CONFIG + "/management/auto-reply"
 	files, err := ioutil.ReadDir(root)
 	if err != nil {
@@ -113,13 +132,9 @@ func update() {
 
 		content, err := ioutil.ReadFile(root + "/" + file.Name())
 		if err == nil {
-			responseHandler(content)
+			drm.responseHandler(content)
 		} else {
 			log.Println("Can't read file ", file.Name())
 		}
 	}
-}
-
-func getKeywords() map[string]string {
-	return nil
 }

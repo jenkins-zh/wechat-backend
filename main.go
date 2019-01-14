@@ -11,6 +11,8 @@ import (
 	"sort"
 	"strings"
 
+	core "github.com/linuxsuren/wechat-backend/pkg"
+	"github.com/linuxsuren/wechat-backend/pkg/article"
 	"github.com/linuxsuren/wechat-backend/pkg/config"
 	"github.com/linuxsuren/wechat-backend/pkg/github"
 	"github.com/linuxsuren/wechat-backend/pkg/reply"
@@ -63,44 +65,49 @@ func (we *WeChat) normalRequest(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("welcome aboard WeChat."))
 }
 
-func (we *WeChat) wechatRequest(w http.ResponseWriter, r *http.Request) {
+func (we *WeChat) wechatRequest(writer http.ResponseWriter, r *http.Request) {
 	textRequestBody := we.parseTextRequestBody(r)
 	if textRequestBody != nil {
-		fmt.Printf("Wechat Service: Recv [%s] msg [%s] from user [%s]!\n",
-			textRequestBody.MsgType,
-			textRequestBody.Content,
-			textRequestBody.FromUserName)
-
+		autoReplyInitChains := reply.AutoReplyChains()
+		fmt.Printf("found [%d] autoReply", len(autoReplyInitChains))
 		for _, autoReplyInit := range autoReplyInitChains {
+			if autoReplyInit == nil {
+				fmt.Printf("found a nil autoReply.")
+				continue
+			}
 			autoReply := autoReplyInit()
 			if !autoReply.Accept(textRequestBody) {
 				continue
 			}
 
-			var data []byte
-			var err error
-			if data, err = autoReply.Handle(); err != nil {
-				log.Println("handle auto replay error:", err)
+			fmt.Printf("going to handle by %s\n", autoReply.Name())
+
+			// var data []byte
+			// var err error
+			if data, err := autoReply.Handle(); err != nil {
+				fmt.Printf("handle auto replay error: %v\n", err)
+			} else if len(data) == 0 {
+				fmt.Println("response body is empty.")
+			} else {
+				fmt.Printf("response:%s\n", data)
+				fmt.Fprintf(writer, data)
+				break
 			}
-			fmt.Fprintf(w, string(data))
-			break
 		}
 	}
 }
 
-func (w *WeChat) parseTextRequestBody(r *http.Request) *reply.TextRequestBody {
+func (w *WeChat) parseTextRequestBody(r *http.Request) *core.TextRequestBody {
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		log.Fatal(err)
 		return nil
 	}
 	fmt.Println(string(body))
-	requestBody := &reply.TextRequestBody{}
+	requestBody := &core.TextRequestBody{}
 	xml.Unmarshal(body, requestBody)
 	return requestBody
 }
-
-var autoReplyInitChains []reply.Init
 
 func main() {
 	weConfig, err := config.LoadConfig("config/wechat.yaml")
@@ -118,21 +125,21 @@ func main() {
 		weConfig.ServerPort = 8080
 	}
 
+	defaultRM := article.NewDefaultResponseManager()
+	reply.SetResponseManager(defaultRM)
+
 	wechat := WeChat{
 		Config: weConfig,
 	}
 	go func() {
-		initCheck(weConfig)
+		defaultRM.InitCheck(weConfig)
 	}()
 	createWxMenu()
-
-	autoReplyInitChains = make([]reply.Init, 1)
-	autoReplyInitChains = append(autoReplyInitChains, reply.InitMatchAutoReply)
 
 	http.HandleFunc("/", wechat.procRequest)
 	http.HandleFunc("/status", healthHandler)
 	http.HandleFunc("/webhook", func(w http.ResponseWriter, r *http.Request) {
-		github.WebhookHandler(w, r, weConfig, initCheck)
+		github.WebhookHandler(w, r, weConfig, defaultRM.InitCheck)
 	})
 
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", weConfig.ServerPort), nil))

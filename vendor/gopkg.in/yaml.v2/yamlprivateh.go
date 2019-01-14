@@ -59,7 +59,7 @@ func is_ascii(b []byte, i int) bool {
 	return b[i] <= 0x7F
 }
 
-// Check if the character at the start of the buffer can be printed unescaped.
+// Check if the character at the start of the buffer can be printed string.
 func is_printable(b []byte, i int) bool {
 	return ((b[i] == 0x0A) || // . == #x0A
 		(b[i] >= 0x20 && b[i] <= 0x7E) || // #x20 <= . <= #x7E

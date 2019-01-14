@@ -1,4 +1,4 @@
-package reply
+package pkg
 
 import (
 	"encoding/xml"
@@ -17,7 +17,7 @@ type TextRequestBody struct {
 }
 
 type ResponseBody struct {
-	Keyword string `json:"keyword"`
+	Keyword string `json:"keyword" xml:"-"`
 
 	MsgType      string `json:"msgType" yaml:"msgType" xml:"MsgType"`
 	ToUserName   string
