@@ -11,10 +11,13 @@ import (
 type WeChatConfig struct {
 	GitURL              string `yaml:"git_url"`
 	GitBranch           string `yaml:"git_branch"`
-	Token               string `yaml:"token"`
 	GitHubWebHookSecret string `yaml:"github_webhook_secret"`
 
 	ServerPort int `yaml:"server_port"`
+
+	AppID     string `yaml:"appID"`
+	AppSecret string `yaml:"appSecret"`
+	Token     string `yaml:"token"`
 }
 
 // LoadConfig load config

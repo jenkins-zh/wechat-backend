@@ -5,6 +5,8 @@ import (
 	"log"
 	"net/http"
 	"strings"
+
+	"github.com/linuxsuren/wechat-backend/pkg/config"
 )
 
 //https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=APPID&secret=APPSECRET
@@ -14,8 +16,9 @@ type AccessToken struct {
 	Expires     int    `json:"expires_in"`
 }
 
-func getAccessToken() string {
-	resp, err := http.Get(strings.Join([]string{"https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential", "&appid=", "wxdd2924d2e2598bff", "&secret=", "8db8b2ee78059e7f4cb7e38020e2f566"}, ""))
+func getAccessToken(config *config.WeChatConfig) string {
+	resp, err := http.Get(strings.Join([]string{"https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential",
+		"&appid=", config.AppID, "&secret=", config.AppSecret}, ""))
 	if err != nil {
 		return ""
 	}

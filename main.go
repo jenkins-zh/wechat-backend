@@ -53,6 +53,12 @@ func (we *WeChat) procRequest(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Println("Wechat Service: validateUrl Ok!")
 
+	// log.Println("request url", r.URL.String())
+	// if strings.HasPrefix(r.URL.String(), "/?signature=") {
+	// 	log.Println("just for valid")
+	// 	return
+	// }
+
 	switch r.Method {
 	case http.MethodPost:
 		we.wechatRequest(w, r)
@@ -82,8 +88,6 @@ func (we *WeChat) wechatRequest(writer http.ResponseWriter, r *http.Request) {
 
 			fmt.Printf("going to handle by %s\n", autoReply.Name())
 
-			// var data []byte
-			// var err error
 			if data, err := autoReply.Handle(); err != nil {
 				fmt.Printf("handle auto replay error: %v\n", err)
 			} else if len(data) == 0 {
@@ -134,7 +138,7 @@ func main() {
 	go func() {
 		defaultRM.InitCheck(weConfig)
 	}()
-	createWxMenu()
+	createWxMenu(weConfig)
 
 	http.HandleFunc("/", wechat.procRequest)
 	http.HandleFunc("/status", healthHandler)

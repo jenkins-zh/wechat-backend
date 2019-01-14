@@ -2,10 +2,11 @@ package main
 
 import (
 	"bytes"
-	"fmt"
 	"log"
 	"net/http"
 	"strings"
+
+	"github.com/linuxsuren/wechat-backend/pkg/config"
 )
 
 func PushWxMenuCreate(accessToken string, menuJsonBytes []byte) error {
@@ -33,7 +34,7 @@ func PushWxMenuCreate(accessToken string, menuJsonBytes []byte) error {
 	return nil
 }
 
-func createWxMenu() {
+func createWxMenu(config *config.WeChatConfig) {
 
 	//btn1 := models.Btn{Name: "进入商城", Url: "http://www.baidu.com/", Btype: "view"}
 	//btn2 := models.Btn{Name: "会员中心", Key: "molan_user_center", Btype: "click"}
@@ -78,8 +79,7 @@ func createWxMenu() {
 	//fmt.Println("生成的菜单json--->", menuStr)
 
 	//发送建立菜单的post请求
-	token := getAccessToken()
-	fmt.Println("token", token)
+	token := getAccessToken(config)
 	PushWxMenuCreate(token, []byte(menuStr))
 	//} else {
 	//  logUtils.GetLog().Error("微信菜单json转换错误", err)
