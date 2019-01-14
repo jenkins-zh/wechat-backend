@@ -58,7 +58,7 @@ func (m *SearchAutoReply) Handle() (string, error) {
 	if len(articles) == 0 {
 		targetArticle = article.Article{
 			Title:       "404",
-			Description: "404",
+			Description: "没有找到相关的文章，给我们留言，或者直接发 PR 过来！",
 			URI:         "https://jenkins-zh.github.io",
 		}
 	} else {
@@ -71,7 +71,7 @@ func (m *SearchAutoReply) Handle() (string, error) {
 				{
 					Title:       targetArticle.Title,
 					Description: targetArticle.Description,
-					PicUrl:      "https://jenkins-zh.github.io/images/2018-survey-qrcode.jpg",
+					PicUrl:      "https://mmbiz.qpic.cn/mmbiz_jpg/nh8sibXrvHrvicMyefXop7qwrnWQc5gtBgia05BicxFCWdjPkee3Ku9FLwBZR3JJVDwvVDL25p90BLPOTOWUCrribLA/0?wx_fmt=jpeg",
 					Url:         targetArticle.URI,
 				},
 			},
