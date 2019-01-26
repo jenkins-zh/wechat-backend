@@ -3,7 +3,7 @@ FROM alpine:3.3
 USER root
 
 RUN apk -U upgrade && \
-    apk -U add ca-certificates && \
+    apk -U add --no-cache ca-certificates && \
     update-ca-certificates
 
 COPY bin/wechat-backend wechat-backend

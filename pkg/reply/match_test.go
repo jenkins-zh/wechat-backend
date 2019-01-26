@@ -56,8 +56,6 @@ func TestHandle(t *testing.T) {
 	data, err := reply.Handle()
 	if err != nil {
 		t.Errorf("should not error %v", err)
-	} else if data == nil {
-		t.Errorf("not have data")
 	} else if string(data) != "hello" {
 		t.Errorf("got an error content: %s", string(data))
 	}

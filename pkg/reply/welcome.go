@@ -13,6 +13,7 @@ type WelcomeReply struct {
 
 var _ AutoReply = &WelcomeReply{}
 
+// Name represents the name for reply
 func (m *WelcomeReply) Name() string {
 	return "WelcomeReply"
 }
@@ -21,6 +22,7 @@ func (m *WelcomeReply) Name() string {
 func (m *WelcomeReply) Accept(request *core.TextRequestBody) (ok bool) {
 	if "event" == request.MsgType && "subscribe" == request.Event {
 		request.Content = "welcome"
+		request.MsgType = "text"
 		m.AutoReply = &MatchAutoReply{}
 		ok = m.AutoReply.Accept(request)
 	}
