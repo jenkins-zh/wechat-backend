@@ -1,5 +1,9 @@
 build:
-	env GOOS=linux go build -o bin/wechat-backend
+	CGO_ENABLED=0 GOOS=linux go build -ldflags "-w -s" -a -installsuffix cgo -o bin/wechat-backend
+	upx bin/wechat-backend
+
+build-local:
+	env go build -o bin/wechat-backend
 	upx bin/wechat-backend
 
 image: build
