@@ -16,6 +16,7 @@ import (
 	"github.com/linuxsuren/wechat-backend/pkg/config"
 	"github.com/linuxsuren/wechat-backend/pkg/github"
 	"github.com/linuxsuren/wechat-backend/pkg/reply"
+	"github.com/linuxsuren/wechat-backend/pkg/service"
 )
 
 // WeChat represents WeChat
@@ -23,15 +24,15 @@ type WeChat struct {
 	Config *config.WeChatConfig
 }
 
-func (w *WeChat) makeSignature(timestamp, nonce string) string {
-	sl := []string{w.Config.Token, timestamp, nonce}
+func (we *WeChat) makeSignature(timestamp, nonce string) string {
+	sl := []string{we.Config.Token, timestamp, nonce}
 	sort.Strings(sl)
 	s := sha1.New()
 	io.WriteString(s, strings.Join(sl, ""))
 	return fmt.Sprintf("%x", s.Sum(nil))
 }
 
-func (we *WeChat) validateUrl(w http.ResponseWriter, r *http.Request) bool {
+func (we *WeChat) validateURL(w http.ResponseWriter, r *http.Request) bool {
 	timestamp := strings.Join(r.Form["timestamp"], "")
 	nonce := strings.Join(r.Form["nonce"], "")
 	signatureGen := we.makeSignature(timestamp, nonce)
@@ -47,12 +48,12 @@ func (we *WeChat) validateUrl(w http.ResponseWriter, r *http.Request) bool {
 
 func (we *WeChat) procRequest(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
-	if !we.validateUrl(w, r) {
+	if !we.validateURL(w, r) {
 		we.normalRequest(w, r)
 		log.Println("Wechat Service: this http request is not from Wechat platform!")
 		return
 	}
-	log.Println("Wechat Service: validateUrl Ok!")
+	log.Println("Wechat Service: validateURL Ok!")
 
 	if we.Config.Valid {
 		log.Println("request url", r.URL.String())
@@ -69,7 +70,7 @@ func (we *WeChat) procRequest(w http.ResponseWriter, r *http.Request) {
 }
 
 func (we *WeChat) normalRequest(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("welcome aboard WeChat."))
+	w.Write([]byte("Welcome aboard Jenkins WeChat."))
 }
 
 func (we *WeChat) wechatRequest(writer http.ResponseWriter, r *http.Request) {
@@ -112,7 +113,7 @@ func (we *WeChat) wechatRequest(writer http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (w *WeChat) parseTextRequestBody(r *http.Request) *core.TextRequestBody {
+func (we *WeChat) parseTextRequestBody(r *http.Request) *core.TextRequestBody {
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		log.Fatal(err)
@@ -125,11 +126,12 @@ func (w *WeChat) parseTextRequestBody(r *http.Request) *core.TextRequestBody {
 }
 
 func main() {
-	weConfig, err := config.LoadConfig("config/wechat.yaml")
+	weConfig, err := config.LoadConfig(core.ConfigPath)
 	if err != nil {
 		log.Printf("load config error %v\n", err)
 	}
 
+	// TODO this should be handle by config function
 	if weConfig == nil {
 		weConfig = &config.WeChatConfig{
 			ServerPort: 8080,
@@ -155,6 +157,9 @@ func main() {
 	http.HandleFunc("/status", healthHandler)
 	http.HandleFunc("/webhook", func(w http.ResponseWriter, r *http.Request) {
 		github.WebhookHandler(w, r, weConfig, defaultRM.InitCheck)
+	})
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		service.HandleConfig(w, r, weConfig)
 	})
 
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", weConfig.ServerPort), nil))
