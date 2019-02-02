@@ -76,6 +76,8 @@ func (we *WeChat) wechatRequest(writer http.ResponseWriter, r *http.Request) {
 	if textRequestBody != nil {
 		autoReplyInitChains := reply.AutoReplyChains()
 		fmt.Printf("found [%d] autoReply", len(autoReplyInitChains))
+
+		var potentialReplys []reply.AutoReply
 		for _, autoReplyInit := range autoReplyInitChains {
 			if autoReplyInit == nil {
 				fmt.Printf("found a nil autoReply.")
@@ -86,6 +88,13 @@ func (we *WeChat) wechatRequest(writer http.ResponseWriter, r *http.Request) {
 				continue
 			}
 
+			potentialReplys = append(potentialReplys, autoReply)
+		}
+
+		sort.Sort(reply.ByWeight(potentialReplys))
+
+		if len(potentialReplys) > 0 {
+			autoReply := potentialReplys[0]
 			fmt.Printf("going to handle by %s\n", autoReply.Name())
 
 			if data, err := autoReply.Handle(); err != nil {
@@ -95,8 +104,9 @@ func (we *WeChat) wechatRequest(writer http.ResponseWriter, r *http.Request) {
 			} else {
 				fmt.Printf("response:%s\n", data)
 				fmt.Fprintf(writer, data)
-				break
 			}
+		} else {
+			fmt.Println("should have at least one reply")
 		}
 	}
 }

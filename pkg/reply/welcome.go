@@ -29,6 +29,10 @@ func (m *WelcomeReply) Accept(request *core.TextRequestBody) (ok bool) {
 	return
 }
 
+func (m *WelcomeReply) Weight() int {
+	return 0
+}
+
 func init() {
 	fmt.Println("register for welcome")
 	Register(func() AutoReply {

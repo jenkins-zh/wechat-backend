@@ -26,6 +26,10 @@ func (m *MatchAutoReply) Name() string {
 	return "SimpleMatchReply"
 }
 
+func (m *MatchAutoReply) Weight() int {
+	return 0
+}
+
 // Accept consider if it will accept the request
 func (m *MatchAutoReply) Accept(request *core.TextRequestBody) (ok bool) {
 	m.Request = request

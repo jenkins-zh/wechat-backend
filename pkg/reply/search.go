@@ -22,6 +22,10 @@ func (m *SearchAutoReply) Name() string {
 	return "SearchAutoReply"
 }
 
+func (m *SearchAutoReply) Weight() int {
+	return 0
+}
+
 // Accept consider if it will accept the request
 func (m *SearchAutoReply) Accept(request *core.TextRequestBody) (ok bool) {
 	m.Request = request

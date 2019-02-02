@@ -7,10 +7,12 @@ import (
 	core "github.com/linuxsuren/wechat-backend/pkg"
 )
 
+// AutoReply represent auto reply interface
 type AutoReply interface {
 	Accept(request *core.TextRequestBody) bool
 	Handle() (string, error)
 	Name() string
+	Weight() int
 }
 
 type Init func() AutoReply
