@@ -18,6 +18,8 @@ type WeChatConfig struct {
 	AppID     string `yaml:"appID"`
 	AppSecret string `yaml:"appSecret"`
 	Token     string `yaml:"token"`
+
+	Valid bool `yaml:"valid"`
 }
 
 // LoadConfig load config

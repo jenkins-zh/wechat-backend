@@ -48,22 +48,23 @@ func (we *WeChat) validateUrl(w http.ResponseWriter, r *http.Request) bool {
 func (we *WeChat) procRequest(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	if !we.validateUrl(w, r) {
+		we.normalRequest(w, r)
 		log.Println("Wechat Service: this http request is not from Wechat platform!")
 		return
 	}
 	log.Println("Wechat Service: validateUrl Ok!")
 
-	// log.Println("request url", r.URL.String())
-	// if strings.HasPrefix(r.URL.String(), "/?signature=") {
-	// 	log.Println("just for valid")
-	// 	return
-	// }
+	if we.Config.Valid {
+		log.Println("request url", r.URL.String())
+		if strings.HasPrefix(r.URL.String(), "/?signature=") {
+			log.Println("just for valid")
+			return
+		}
+	}
 
 	switch r.Method {
 	case http.MethodPost:
 		we.wechatRequest(w, r)
-	case http.MethodGet:
-		we.normalRequest(w, r)
 	}
 }
 
