@@ -3,7 +3,9 @@ package config
 import "testing"
 
 func TestLoadConfig(t *testing.T) {
-	config, err := LoadConfig("config.yaml")
+	cfg := &LocalFileConfig{}
+
+	config, err := cfg.LoadConfig("config.yaml")
 	if err != nil {
 		t.Errorf("load config error %v", err)
 	}

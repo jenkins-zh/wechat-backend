@@ -1,13 +1,5 @@
 package config
 
-import (
-	"io/ioutil"
-	"log"
-
-	core "github.com/linuxsuren/wechat-backend/pkg"
-	yaml "gopkg.in/yaml.v2"
-)
-
 // WeChatConfig represents WeChat config
 type WeChatConfig struct {
 	GitURL              string `yaml:"git_url"`
@@ -28,29 +20,9 @@ func NewConfig() *WeChatConfig {
 	return &WeChatConfig{}
 }
 
-// LoadConfig load config
-func LoadConfig(configFile string) (config *WeChatConfig, err error) {
-	var content []byte
-	content, err = ioutil.ReadFile(configFile)
-	if err != nil {
-		log.Printf("load config file [%s] error: %v\n", configFile, err)
-		return
-	}
-
-	config = NewConfig()
-	err = yaml.Unmarshal(content, config)
-	if err != nil {
-		log.Printf("parse config file error: %v\n", err)
-	}
-	return
-}
-
-// SettingConfig set the WeChat config
-func (wc *WeChatConfig) SettingConfig() (err error) {
-	var data []byte
-	data, err = yaml.Marshal(wc)
-	if err == nil {
-		err = ioutil.WriteFile(core.ConfigPath, data, 0644)
-	}
-	return
+// WeChatConfigurator represent the spec for configuration reader
+type WeChatConfigurator interface {
+	LoadConfig(string) (*WeChatConfig, error)
+	GetConfig() *WeChatConfig
+	SaveConfig() error
 }

@@ -9,13 +9,15 @@ import (
 )
 
 // HandleConfig handle the config modify
-func HandleConfig(w http.ResponseWriter, r *http.Request, weConfig *config.WeChatConfig) {
+func HandleConfig(w http.ResponseWriter, r *http.Request, weConfig config.WeChatConfigurator) {
 	r.ParseForm()
 
 	validStr := strings.Join(r.Form["valid"], "")
-	weConfig.Valid = (validStr == "true")
 
-	w.Write([]byte(fmt.Sprintf("WeChat valid: %v", weConfig.Valid)))
+	config := weConfig.GetConfig()
+	config.Valid = (validStr == "true")
 
-	weConfig.SettingConfig()
+	w.Write([]byte(fmt.Sprintf("WeChat valid: %v", config.Valid)))
+
+	weConfig.SaveConfig()
 }

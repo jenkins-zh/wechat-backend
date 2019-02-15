@@ -15,6 +15,8 @@ import (
 	"github.com/linuxsuren/wechat-backend/pkg/article"
 	"github.com/linuxsuren/wechat-backend/pkg/config"
 	"github.com/linuxsuren/wechat-backend/pkg/github"
+	"github.com/linuxsuren/wechat-backend/pkg/health"
+	"github.com/linuxsuren/wechat-backend/pkg/menu"
 	"github.com/linuxsuren/wechat-backend/pkg/reply"
 	"github.com/linuxsuren/wechat-backend/pkg/service"
 )
@@ -126,7 +128,8 @@ func (we *WeChat) parseTextRequestBody(r *http.Request) *core.TextRequestBody {
 }
 
 func main() {
-	weConfig, err := config.LoadConfig(core.ConfigPath)
+	configurator := &config.LocalFileConfig{}
+	weConfig, err := configurator.LoadConfig(core.ConfigPath)
 	if err != nil {
 		log.Printf("load config error %v\n", err)
 	}
@@ -151,15 +154,15 @@ func main() {
 	go func() {
 		defaultRM.InitCheck(weConfig)
 	}()
-	createWxMenu(weConfig)
+	menu.CreateWxMenu(weConfig)
 
 	http.HandleFunc("/", wechat.procRequest)
-	http.HandleFunc("/status", healthHandler)
+	http.HandleFunc("/status", health.SimpleHealthHandler)
 	http.HandleFunc("/webhook", func(w http.ResponseWriter, r *http.Request) {
 		github.WebhookHandler(w, r, weConfig, defaultRM.InitCheck)
 	})
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		service.HandleConfig(w, r, weConfig)
+	http.HandleFunc("/config", func(w http.ResponseWriter, r *http.Request) {
+		service.HandleConfig(w, r, configurator)
 	})
 
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", weConfig.ServerPort), nil))

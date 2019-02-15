@@ -1,4 +1,4 @@
-package main
+package menu
 
 import (
 	"bytes"
@@ -7,9 +7,10 @@ import (
 	"strings"
 
 	"github.com/linuxsuren/wechat-backend/pkg/config"
+	"github.com/linuxsuren/wechat-backend/pkg/token"
 )
 
-func PushWxMenuCreate(accessToken string, menuJsonBytes []byte) error {
+func pushWxMenuCreate(accessToken string, menuJsonBytes []byte) error {
 	postReq, err := http.NewRequest(http.MethodPost,
 		strings.Join([]string{"https://api.weixin.qq.com/cgi-bin/menu/create", "?access_token=", accessToken}, ""),
 		bytes.NewReader(menuJsonBytes))
@@ -34,16 +35,8 @@ func PushWxMenuCreate(accessToken string, menuJsonBytes []byte) error {
 	return nil
 }
 
-func createWxMenu(config *config.WeChatConfig) {
-
-	//btn1 := models.Btn{Name: "进入商城", Url: "http://www.baidu.com/", Btype: "view"}
-	//btn2 := models.Btn{Name: "会员中心", Key: "molan_user_center", Btype: "click"}
-	//btn3 := models.Btn{Name: "我的", Url: "http://www.baidu.com/user_view", Btype: "view"}
-	//
-	//btns := []models.Btn{btn1, btn2, btn3}
-	//wxMenu := models.WxMenu{Button: btns}
-	//menuJsonBytes, err := json.Marshal(wxMenu)
-
+// CreateWxMenu create wechat menu
+func CreateWxMenu(config *config.WeChatConfig) {
 	menuStr := `{
             "button": [
             {
@@ -74,14 +67,7 @@ func createWxMenu(config *config.WeChatConfig) {
             ]
         }`
 
-	//if err == nil {
-
-	//fmt.Println("生成的菜单json--->", menuStr)
-
 	//发送建立菜单的post请求
-	token := getAccessToken(config)
-	PushWxMenuCreate(token, []byte(menuStr))
-	//} else {
-	//  logUtils.GetLog().Error("微信菜单json转换错误", err)
-	//}
+	token := token.GetAccessToken(config)
+	pushWxMenuCreate(token, []byte(menuStr))
 }
