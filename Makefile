@@ -1,4 +1,4 @@
-TAG=dev-$(shell cat .version)-$(shell git config --get user.email | sed -e "s/@/-/")
+TAG=dev-$(shell git rev-parse HEAD | cut -c 1-8)
 
 build:
 	CGO_ENABLED=0 GOOS=linux go build -ldflags "-w -s" -a -installsuffix cgo -o bin/wechat-backend
@@ -12,13 +12,13 @@ image: build
 	docker build -t surenpi/jenkins-wechat:${TAG} .
 
 image-alauda: build
-	docker build -t index.alauda.cn/alaudak8s/jenkins-wechat .
+	docker build -t index.alauda.cn/alaudak8s/jenkins-wechat:${TAG} .
 
 push-image: image
 	docker push surenpi/jenkins-wechat:${TAG}
 
 push-image-alauda: image-alauda
-	docker push index.alauda.cn/alaudak8s/jenkins-wechat
+	docker push index.alauda.cn/alaudak8s/jenkins-wechat:${TAG}
 
 image-ubuntu: build
 	docker build -t surenpi/jenkins-wechat:ubuntu . -f Dockerfile.ubuntu
