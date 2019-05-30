@@ -37,7 +37,7 @@ pipeline {
 
         stage("image") {
             steps {
-                container('golang'){
+                container('tools'){
                     dir(FOLDER) {
                         sh '''
                         IMAGE_TAG=$(git rev-parse --short HEAD)
@@ -54,7 +54,7 @@ pipeline {
                 DOCKER_CREDS = credentials('docker-surenpi')
             }
             steps {
-                container('golang') {
+                container('tools') {
                     sh '''
                     docker login -u $DOCKER_CREDS_USR -p $DOCKER_CREDS_PSW
                     make push-image
