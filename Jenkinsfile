@@ -12,7 +12,9 @@ pipeline {
         stage("clone") {
             steps {
                 dir(FOLDER) {
-                    scmObj = checkout scm
+                    script {
+                        scmObj = checkout scm
+                    }
                 }
             }
         }
@@ -37,7 +39,7 @@ pipeline {
 
         stage("image") {
             environment {
-                IMAGE_TAG = scmObj.GIT_COMMIT
+                IMAGE_TAG = getCurrentCommit(scmObj)
             }
             steps {
                 container('tools'){
@@ -53,7 +55,7 @@ pipeline {
         stage("push-image") {
             environment {
                 DOCKER_CREDS = credentials('docker-surenpi')
-                IMAGE_TAG = scmObj.GIT_COMMIT
+                IMAGE_TAG = getCurrentCommit(scmObj)
             }
             steps {
                 container('tools') {
@@ -66,4 +68,8 @@ pipeline {
             }
         }
     }
+}
+
+def getCurrentCommit(scmObj) {
+    return scmObj.GIT_COMMIT
 }
