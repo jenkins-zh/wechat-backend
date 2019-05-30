@@ -3,7 +3,7 @@ package article
 import (
 	"testing"
 
-	core "github.com/linuxsuren/wechat-backend/pkg"
+	core "github.com/jenkins-zh/wechat-backend/pkg"
 	"github.com/stretchr/testify/assert"
 )
 

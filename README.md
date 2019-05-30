@@ -14,7 +14,7 @@ Sample config.yaml:
 
 ```
 token: wechat-token
-git_url: https://github.com/linuxsuren/wechat
+git_url: https://github.com/jenkins-zh/wechat
 git_branch: master
 github_webhook_secret: github-secret
 appID: wechat-appid

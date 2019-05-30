@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"log"
 
-	core "github.com/linuxsuren/wechat-backend/pkg"
-	"github.com/linuxsuren/wechat-backend/pkg/article"
+	core "github.com/jenkins-zh/wechat-backend/pkg"
+	"github.com/jenkins-zh/wechat-backend/pkg/article"
 )
 
 var responseManager article.ResponseManager

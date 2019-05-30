@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/linuxsuren/wechat-backend/pkg/config"
+	"github.com/jenkins-zh/wechat-backend/pkg/config"
 )
 
 func PushWxMenuCreate(accessToken string, menuJsonBytes []byte) error {

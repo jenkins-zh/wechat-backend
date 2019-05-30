@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/linuxsuren/wechat-backend/pkg/config"
+	"github.com/jenkins-zh/wechat-backend/pkg/config"
 )
 
 //https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=APPID&secret=APPSECRET
