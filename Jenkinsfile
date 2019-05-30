@@ -5,7 +5,7 @@ pipeline {
 
     environment {
         IMAGE_TAG = ""
-        FOLDER = 'src/github.io/jenkins-zh'
+        FOLDER = 'src/github.com/jenkins-zh'
     }
 
     stages{
