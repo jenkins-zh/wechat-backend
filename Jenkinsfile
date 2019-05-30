@@ -5,7 +5,7 @@ pipeline {
 
     environment {
         IMAGE_TAG = ""
-        FOLDER = 'src/github.com/jenkins-zh'
+        FOLDER = 'src/github.com/jenkins-zh/wechat-backend'
     }
 
     stages{
@@ -22,12 +22,14 @@ pipeline {
                 GOPATH = "${WORKSPACE}"
             }
             steps {
-                container('golang'){
-                    dir(FOLDER) {
-                        sh '''
-                        CGO_ENABLED=0 GOOS=linux go build -ldflags "-w -s" -a -installsuffix cgo -o bin/wechat-backend
-                        upx bin/wechat-backend
-                        '''
+                dir(FOLDER) {
+                    container('golang'){
+                            sh '''
+                            CGO_ENABLED=0 GOOS=linux go build -ldflags "-w -s" -a -installsuffix cgo -o bin/wechat-backend
+                            '''
+                    }
+                    container('tools') {
+                        sh 'upx bin/wechat-backend'
                     }
                 }
             }
