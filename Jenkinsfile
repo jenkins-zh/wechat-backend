@@ -9,6 +9,9 @@ pipeline {
 
     stages{
         stage("build") {
+            environment {
+                GOPATH = "${WORKSPACE}"
+            }
             steps {
                 container('golang'){
                     sh '''
