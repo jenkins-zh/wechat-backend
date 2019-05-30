@@ -3,7 +3,7 @@ package reply
 import (
 	"testing"
 
-	core "github.com/linuxsuren/wechat-backend/pkg"
+	core "github.com/jenkins-zh/wechat-backend/pkg"
 )
 
 func TestSearch(t *testing.T) {

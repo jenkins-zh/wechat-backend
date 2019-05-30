@@ -6,7 +6,7 @@ package mock_article
 
 import (
 	gomock "github.com/golang/mock/gomock"
-	config "github.com/linuxsuren/wechat-backend/pkg/config"
+	config "github.com/jenkins-zh/wechat-backend/pkg/config"
 	reflect "reflect"
 )
 

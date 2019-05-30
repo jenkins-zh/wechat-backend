@@ -11,11 +11,11 @@ import (
 	"sort"
 	"strings"
 
-	core "github.com/linuxsuren/wechat-backend/pkg"
-	"github.com/linuxsuren/wechat-backend/pkg/article"
-	"github.com/linuxsuren/wechat-backend/pkg/config"
-	"github.com/linuxsuren/wechat-backend/pkg/github"
-	"github.com/linuxsuren/wechat-backend/pkg/reply"
+	core "github.com/jenkins-zh/wechat-backend/pkg"
+	"github.com/jenkins-zh/wechat-backend/pkg/article"
+	"github.com/jenkins-zh/wechat-backend/pkg/config"
+	"github.com/jenkins-zh/wechat-backend/pkg/github"
+	"github.com/jenkins-zh/wechat-backend/pkg/reply"
 )
 
 // WeChat represents WeChat

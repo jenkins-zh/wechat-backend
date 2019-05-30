@@ -4,8 +4,8 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	core "github.com/linuxsuren/wechat-backend/pkg"
-	mArticle "github.com/linuxsuren/wechat-backend/pkg/mock/article"
+	core "github.com/jenkins-zh/wechat-backend/pkg"
+	mArticle "github.com/jenkins-zh/wechat-backend/pkg/mock/article"
 )
 
 func TestAccept(t *testing.T) {

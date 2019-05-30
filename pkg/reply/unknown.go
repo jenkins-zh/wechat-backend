@@ -3,7 +3,7 @@ package reply
 import (
 	"math"
 
-	core "github.com/linuxsuren/wechat-backend/pkg"
+	core "github.com/jenkins-zh/wechat-backend/pkg"
 )
 
 // UnknownAutoReply unknown auto reply
