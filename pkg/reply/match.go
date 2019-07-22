@@ -3,6 +3,8 @@ package reply
 import (
 	"fmt"
 	"log"
+	"math/rand"
+	"time"
 
 	core "github.com/jenkins-zh/wechat-backend/pkg"
 	"github.com/jenkins-zh/wechat-backend/pkg/article"
@@ -76,6 +78,21 @@ func (m *MatchAutoReply) Handle() (string, error) {
 		data, err = makeNewsResponseBody(from, to, news)
 		if err != nil {
 			err = fmt.Errorf("Wechat Service: makeNewsResponseBody error: %v", err)
+		}
+	} else if random, ok := resp.(core.RandomResponseBody); ok {
+		items := random.Items
+		count := len(items)
+
+		r := rand.New(rand.NewSource(time.Now().UnixNano()))
+		index := r.Intn(count)
+
+		fmt.Printf("response random item count: %d, index: %d\n", count, index)
+
+		rondomText := fmt.Sprintf("%s\n%s", random.Content, items[index])
+
+		data, err = makeTextResponseBody(from, to, rondomText)
+		if err != nil {
+			err = fmt.Errorf("Wechat Service: RandomResponseBody error: %v", err)
 		}
 	} else {
 		err = fmt.Errorf("type error %v", resp)

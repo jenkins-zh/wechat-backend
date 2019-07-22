@@ -17,9 +17,10 @@ image:
   mediaID: mediaId
 `
 
-	responseHandler([]byte(yml))
+	mgr := NewDefaultResponseManager()
+	mgr.responseHandler([]byte(yml))
 
-	resp := respMap["hi"]
+	resp := mgr.ResponseMap["hi"]
 	if resp == nil {
 		t.Error("Can't find response by keyword: hi.")
 	}
@@ -44,9 +45,10 @@ articles:
   url: "http://blog.com"
 `
 
-	responseHandler([]byte(yml))
+	mgr := NewDefaultResponseManager()
+	mgr.responseHandler([]byte(yml))
 
-	resp := respMap["about"]
+	resp := mgr.ResponseMap["about"]
 	if resp == nil {
 		t.Error("Can't find response by keyword: about.")
 		return
@@ -57,4 +59,30 @@ articles:
 		t.Error("Get the wrong type, should be NewsResponseBody.")
 	}
 	assert.Equal(t, newsResp.Articles.Articles[0].Title, "title", "title parse error.")
+}
+
+func TestRandomResponseBody(t *testing.T) {
+	yml := `
+keyword: weixin
+msgType: random
+items:
+- abc
+- def
+`
+
+	mgr := NewDefaultResponseManager()
+	mgr.responseHandler([]byte(yml))
+
+	resp := mgr.ResponseMap["weixin"]
+	if resp == nil {
+		t.Error("Can't find response by keyword: weixin.")
+		return
+	}
+
+	newsResp, ok := resp.(core.RandomResponseBody)
+	if !ok {
+		t.Error("Get the wrong type, should be RandomResponseBody.")
+	}
+	assert.Equal(t, len(newsResp.Items), 2, "can not parse items")
+	assert.Equal(t, newsResp.Items[0], "abc")
 }

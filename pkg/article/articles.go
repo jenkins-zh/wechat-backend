@@ -54,6 +54,7 @@ func (drm *DefaultResponseManager) InitCheck(weConfig *config.WeChatConfig) {
 				log.Println("clone failure", err)
 				return
 			}
+			log.Println("the clone progress is done")
 		} else {
 			r, err := git.PlainOpen(CONFIG)
 			if err == nil {
@@ -110,6 +111,10 @@ func (drm *DefaultResponseManager) responseHandler(yamlContent []byte) {
 			news := core.NewsResponseBody{}
 			yaml.Unmarshal(yamlContent, &news)
 			drm.ResponseMap[reps.Keyword] = news
+		case "random": // TODO this not the regular way
+			random := core.RandomResponseBody{}
+			yaml.Unmarshal(yamlContent, &random)
+			drm.ResponseMap[reps.Keyword] = random
 		default:
 			log.Println("unknow type", reps.MsgType)
 		}
