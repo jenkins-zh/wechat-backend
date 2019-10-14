@@ -1,0 +1,15 @@
+github.com/emirpasic/gods v0.0.0-20180618112450-bba54c718c4e/go.mod h1:YfzfFFoVP/catgzJb4IKIqXjX78Ha8FMSDh3ymbK86o=
+github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99/go.mod h1:1lJo3i6rXxKeerYnT8Nvf0QmHCRC1n8sfWVwXF2Frvo=
+github.com/kevinburke/ssh_config v0.0.0-20180422193403-4fcc689beeab/go.mod h1:CT57kijsi8u/K/BOFA39wgDQJ9CxiF4nAY/ojJ6r6mM=
+github.com/mitchellh/go-homedir v0.0.0-20180523094522-3864e76763d9/go.mod h1:SfyaCUpYCn1Vlf4IUYiD9fPX4A5wJrkLzIz1N1q0pr0=
+github.com/pelletier/go-buffruneio v0.0.0-20180119162133-e2f66f8164ca/go.mod h1:JkE26KsDizTr40EUHkXVtNPvgGtbSNq5BcowyYOWdKo=
+github.com/sergi/go-diff v0.0.0-20180205163309-da645544ed44/go.mod h1:0CfEIISq7TuYL3j771MWULgwwjU+GofnZX9QAmXWZgo=
+github.com/src-d/gcfg v1.3.0/go.mod h1:p/UMsR43ujA89BJY9duynAwIpvqEujIH/jFlfL7jWoI=
+github.com/stretchr/testify v0.0.0-20181115233458-8019298d9fa5/go.mod h1:a8OnRcib4nhh0OaRAV+Yts87kKdq0PP7pXfy6kDkUVs=
+github.com/xanzy/ssh-agent v0.1.0/go.mod h1:0NyE30eGUDliuLEHJgYte/zncp2zdTStcOnWhgSqHD8=
+gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
+gopkg.in/go-playground/webhooks.v5 v5.3.0/go.mod h1:LZbya/qLVdbqDR1aKrGuWV6qbia2zCYSR5dpom2SInQ=
+gopkg.in/src-d/go-billy.v4 v4.2.0/go.mod h1:ZHSF0JP+7oD97194otDUCD7Ofbk63+xFcfWP5bT6h+Q=
+gopkg.in/src-d/go-git.v4 v4.4.1/go.mod h1:CzbUWqMn4pvmvndg3gnh5iZFmSsbhyhUWdI0IQ60AQo=
+gopkg.in/warnings.v0 v0.1.2/go.mod h1:jksf8JmL6Qr/oQM2OXTHunEvvTAsrWBLb6OOjuVWRNI=
+gopkg.in/yaml.v2 v2.2.1/go.mod h1:hI93XBmqTisBFMUTm0b8Fm+jr3Dg1NNxqwp+5A1VGuI=

@@ -1,4 +1,5 @@
-TAG=dev-$(shell cat .version)-$(shell git config --get user.email | sed -e "s/@/-/")
+COMMIT:=$(shell git rev-parse --short HEAD)
+TAG=$(COMMIT)
 
 build:
 	CGO_ENABLED=0 GOOS=linux go build -ldflags "-w -s" -a -installsuffix cgo -o bin/wechat-backend
