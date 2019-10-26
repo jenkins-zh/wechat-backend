@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	core "github.com/jenkins-zh/wechat-backend/pkg"
+	"github.com/jenkins-zh/wechat-backend/pkg/api"
 	"github.com/jenkins-zh/wechat-backend/pkg/article"
 	"github.com/jenkins-zh/wechat-backend/pkg/config"
 	"github.com/jenkins-zh/wechat-backend/pkg/github"
@@ -152,6 +153,7 @@ func main() {
 
 	http.HandleFunc("/", wechat.procRequest)
 	http.HandleFunc("/status", healthHandler)
+	http.HandleFunc("/medias", api.ListMedias)
 	http.HandleFunc("/webhook", func(w http.ResponseWriter, r *http.Request) {
 		github.WebhookHandler(w, r, weConfig, defaultRM.InitCheck)
 	})

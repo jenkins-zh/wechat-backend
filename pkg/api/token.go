@@ -1,4 +1,4 @@
-package main
+package api
 
 import (
 	"encoding/json"
@@ -16,7 +16,7 @@ type AccessToken struct {
 	Expires     int    `json:"expires_in"`
 }
 
-func getAccessToken(config *config.WeChatConfig) string {
+func GetAccessToken(config *config.WeChatConfig) string {
 	resp, err := http.Get(strings.Join([]string{"https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential",
 		"&appid=", config.AppID, "&secret=", config.AppSecret}, ""))
 	if err != nil {

@@ -25,3 +25,5 @@ server_port: 8080
 One simple command could bring the Jenkins wechat backend up:
 
 `docker run -t -p 12345:8080 -v /var/wechat/config:/config surenpi/jenkins-wechat`
+
+docker run -t -p 45678:18080 -v /var/wechat/config:/config surenpi/jenkins-wechat:dev--LinuxSuRen-gmail.com

@@ -46,6 +46,7 @@ pipeline {
                     dir(FOLDER) {
                         sh '''
                         docker build -t surenpi/jenkins-wechat:$IMAGE_TAG .
+                        docker build -t surenpi/jenkins-wechat:$IMAGE_TAG-ubuntu -f Dockerfile.ubuntu .
                         '''
                     }
                 }
@@ -62,6 +63,7 @@ pipeline {
                     sh '''
                     docker login -u $DOCKER_CREDS_USR -p $DOCKER_CREDS_PSW
                     docker push surenpi/jenkins-wechat:$IMAGE_TAG
+                    docker push surenpi/jenkins-wechat:$IMAGE_TAG-ubuntu
                     docker logout
                     '''
                 }

@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/jenkins-zh/wechat-backend/pkg/api"
 	"github.com/jenkins-zh/wechat-backend/pkg/config"
 )
 
@@ -79,7 +80,7 @@ func createWxMenu(config *config.WeChatConfig) {
 	//fmt.Println("生成的菜单json--->", menuStr)
 
 	//发送建立菜单的post请求
-	token := getAccessToken(config)
+	token := api.GetAccessToken(config)
 	PushWxMenuCreate(token, []byte(menuStr))
 	//} else {
 	//  logUtils.GetLog().Error("微信菜单json转换错误", err)
