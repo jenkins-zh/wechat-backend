@@ -14,3 +14,5 @@
 # Build stuffs
 bin/
 wechat-backend
+
+.idea

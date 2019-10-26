@@ -5,6 +5,9 @@ import (
 	"time"
 )
 
+// ConfigPath WeChat config file path
+const ConfigPath = "config/wechat.yaml"
+
 type TextRequestBody struct {
 	XMLName      xml.Name `xml:"xml"`
 	ToUserName   string
