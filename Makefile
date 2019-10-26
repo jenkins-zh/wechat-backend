@@ -1,3 +1,5 @@
+CGO_ENABLED = 0
+
 TAG=dev-$(shell cat .version)-$(shell git config --get user.email | sed -e "s/@/-/")
 
 build:
@@ -43,3 +45,6 @@ update-alauda:
 restart:
 	kubectl scale deploy/wechat --replicas=0
 	kubectl scale deploy/wechat --replicas=1
+
+test:
+	go test ./... -v -coverprofile coverage.out

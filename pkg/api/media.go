@@ -11,11 +11,11 @@ import (
 	"github.com/jenkins-zh/wechat-backend/pkg/config"
 )
 
-func ListMedias(w http.ResponseWriter, r *http.Request) {
+func ListMedias(w http.ResponseWriter, r *http.Request, cfg config.WeChatConfigurator) {
 	r.ParseForm()
 	// imageName := r.Form["imageName"]
 
-	if weConfig, err := config.LoadConfig("config/wechat.yaml"); err == nil {
+	if weConfig, err := cfg.LoadConfig("config/wechat.yaml"); err == nil {
 		token := GetAccessToken(weConfig)
 
 		url := fmt.Sprintf("https://api.weixin.qq.com/cgi-bin/material/batchget_material?access_token=%s", token)

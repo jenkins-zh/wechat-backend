@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/linuxsuren/wechat-backend/pkg/config"
+	"github.com/jenkins-zh/wechat-backend/pkg/config"
 )
 
 // HandleConfig handle the config modify

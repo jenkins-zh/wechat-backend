@@ -6,13 +6,8 @@ import (
 	"net/http"
 	"strings"
 
-<<<<<<< HEAD:pkg/menu/menu.go
-	"github.com/linuxsuren/wechat-backend/pkg/config"
-	"github.com/linuxsuren/wechat-backend/pkg/token"
-=======
 	"github.com/jenkins-zh/wechat-backend/pkg/api"
 	"github.com/jenkins-zh/wechat-backend/pkg/config"
->>>>>>> master:menu.go
 )
 
 func pushWxMenuCreate(accessToken string, menuJsonBytes []byte) error {
@@ -73,14 +68,6 @@ func CreateWxMenu(config *config.WeChatConfig) {
         }`
 
 	//发送建立菜单的post请求
-<<<<<<< HEAD:pkg/menu/menu.go
-	token := token.GetAccessToken(config)
-	pushWxMenuCreate(token, []byte(menuStr))
-=======
 	token := api.GetAccessToken(config)
-	PushWxMenuCreate(token, []byte(menuStr))
-	//} else {
-	//  logUtils.GetLog().Error("微信菜单json转换错误", err)
-	//}
->>>>>>> master:menu.go
+	pushWxMenuCreate(token, []byte(menuStr))
 }
