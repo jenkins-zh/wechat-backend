@@ -1,6 +1,6 @@
 CGO_ENABLED = 0
 
-TAG=dev-$(shell cat .version)-$(shell git config --get user.email | sed -e "s/@/-/")
+TAG=dev-$(shell cat .version)$(shell git config --get user.email | sed -e "s/@/-/")-$(shell git rev-parse --short HEAD)
 
 build:
 	CGO_ENABLED=0 GOOS=linux go build -ldflags "-w -s" -a -installsuffix cgo -o bin/wechat-backend

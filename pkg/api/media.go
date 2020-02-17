@@ -56,9 +56,13 @@ func ListMedias(w http.ResponseWriter, r *http.Request, cfg config.WeChatConfigu
 
 		itemList := MediaItemList{}
 		if err = json.Unmarshal(data, &itemList); err == nil {
+			buf := ""
 			for _, item := range itemList.ItemList {
-				fmt.Println("name: ", item.Name, ", id: ", item.MediaID, "url: ", item.URL)
+				buf += fmt.Sprintf("name: %s, id: %s, url: %s", item.Name, item.MediaID, item.URL)
+				buf += "<br/>"
 			}
+
+			w.Write([]byte(buf))
 		} else {
 			log.Printf("read yaml error %v, data: %s", err, string(data))
 		}
