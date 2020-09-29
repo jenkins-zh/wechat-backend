@@ -1,0 +1,17 @@
+name: Build Image
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Build
+        run: |
+          docker login --username ${{ secrets.DOCKER_HUB_USER }} --password ${{secrets.DOCKER_HUB_TOKEN}}
+          docker build -t jenkinszh/jenkins-zh:v0.0.1 .
+          docker push jenkinszh/jenkins-zh:v0.0.1

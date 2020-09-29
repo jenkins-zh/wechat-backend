@@ -73,7 +73,9 @@ func (we *WeChat) procRequest(w http.ResponseWriter, r *http.Request) {
 }
 
 func (we *WeChat) normalRequest(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Welcome aboard Jenkins WeChat."))
+	if _, err := w.Write([]byte("Welcome aboard Jenkins WeChat.")); err != nil {
+		fmt.Printf("got error when response normal request, %v", err)
+	}
 }
 
 func (we *WeChat) wechatRequest(writer http.ResponseWriter, r *http.Request) {
