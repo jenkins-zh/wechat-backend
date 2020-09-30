@@ -1,16 +1,20 @@
-# WeChat Backend
+# 微信公众号自动应答
 
-As a robot, I can take care of some simple works for you.
+作为一个机器人🤖️，我帮您做一些简单事情。
 
-# Fetures
+# 功能
 
-* Welcome new members
-* Auto Replay as Code
-* WebHook (GitHub)
+* 欢迎👏新成员
+* 自动回复即代码
+* 支持通过 WebHook 自动更新配置（GitHub）
 
 # Docker
 
-Sample config.yaml:
+一条简单的 Docker 命令就可以把微信公众号的自动应答程序运行起来：
+
+`docker run -t -p 12345:8080 -v /var/wechat/config:/config surenpi/jenkins-wechat`
+
+示例配置文件 config.yaml:
 
 ```
 token: wechat-token
@@ -21,7 +25,3 @@ appID: wechat-appid
 appSecret: wechat-appsecret
 server_port: 8080
 ```
-
-One simple command could bring the Jenkins wechat backend up:
-
-`docker run -t -p 12345:8080 -v /var/wechat/config:/config surenpi/jenkins-wechat`

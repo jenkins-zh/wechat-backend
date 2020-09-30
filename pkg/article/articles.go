@@ -19,6 +19,7 @@ const (
 )
 
 type ResponseManager interface {
+	// GetResponse find the response, return false if there's no the correct one
 	GetResponse(string) (interface{}, bool)
 	InitCheck(weConfig *config.WeChatConfig)
 }
@@ -116,7 +117,7 @@ func (drm *DefaultResponseManager) responseHandler(yamlContent []byte) {
 			yaml.Unmarshal(yamlContent, &random)
 			drm.ResponseMap[reps.Keyword] = random
 		default:
-			log.Println("unknow type", reps.MsgType)
+			log.Println("unknown type", reps.MsgType)
 		}
 	} else {
 		fmt.Println(err)
