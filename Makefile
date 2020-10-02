@@ -15,31 +15,21 @@ build-local:
 	upx bin/wechat-backend
 
 image: build
-	docker build -t surenpi/jenkins-wechat:${TAG} .
-
-image-alauda: build
-	docker build -t index.alauda.cn/alaudak8s/jenkins-wechat:${TAG} .
+	docker build -t jenkinszh/jenkins-wechat:${TAG} .
 
 push-image: image
-	docker push surenpi/jenkins-wechat:${TAG}
-
-push-image-alauda: image-alauda
-	docker push index.alauda.cn/alaudak8s/jenkins-wechat:${TAG}
+	docker push jenkinszh/jenkins-wechat:${TAG}
 
 image-ubuntu: build
-	docker build -t surenpi/jenkins-wechat:ubuntu . -f Dockerfile.ubuntu
-	docker push surenpi/jenkins-wechat:ubuntu
+	docker build -t jenkinszh/jenkins-wechat:ubuntu . -f Dockerfile.ubuntu
+	docker push jenkinszh/jenkins-wechat:ubuntu
 
 init-mock-dep:
 	go get github.com/golang/mock/gomock
 	go install github.com/golang/mock/mockgen
 
 update:
-	kubectl set image deploy/wechat wechat=surenpi/jenkins-wechat:${TAG}
-	make restart
-
-update-alauda:
-	kubectl set image deploy/wechat wechat=index.alauda.cn/alaudak8s/jenkins-wechat
+	kubectl set image deploy/wechat wechat=jenkinszh/jenkins-wechat:${TAG}
 	make restart
 
 restart:
