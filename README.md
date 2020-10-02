@@ -1,3 +1,6 @@
+[![Docker Pulls](https://img.shields.io/docker/pulls/jenkinszh/wechat-backend.svg)](https://hub.docker.com/r/jenkinszh/wechat-backend/tags)
+[![HitCount](http://hits.dwyl.com/jenkins-zh/wechat-backend.svg)](http://hits.dwyl.com/jenkins-zh/wechat-backend)
+
 # WeChat Backend
 As a robot, I can take care of some simple works for you.
 
@@ -6,20 +9,23 @@ As a robot, I can take care of some simple works for you.
 * Auto Replay as Code
 * Update backend configuration via WebHook (GitHub)
 
-# Keywords
-This robot will auto replay by configured files. But you can give it a config file which contains the keyword `unknown`.
+# Auto-reply
+This robot will auto replay by configured files. You should put those config files into a fixed directory: `/management/auto-reply`.
+It will reply a fixed sentence if there's no matched word. But you can give it a config file which contains the keyword `unknown`.
 
-The structure of config file like blew:
+The structure of the config file like blew:
 ```
 keyword: join
 msgType: text
 content: There is the sentence which will be replyed
 ```
 
-# Docker
-One simple command could bring the Jenkins wechat backend up:
+See some examples from [here](https://github.com/jenkins-zh/wechat-bot-config/tree/master/management/auto-reply).
 
-`docker run -t -p 12345:8080 -v /var/wechat/config:/config surenpi/jenkins-wechat`
+# Docker
+One simple command could bring the WeChat backend up:
+
+`docker run -t -p 12345:8080 -v /var/wechat/config:/config jenkinszh/wechat-backend:v0.0.1`
 
 Sample config.yaml:
 

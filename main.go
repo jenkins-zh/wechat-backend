@@ -5,9 +5,6 @@ import (
 	"encoding/xml"
 	"fmt"
 	"github.com/jenkins-zh/wechat-backend/pkg/api"
-	"github.com/jenkins-zh/wechat-backend/pkg/health"
-	"github.com/jenkins-zh/wechat-backend/pkg/menu"
-	"github.com/jenkins-zh/wechat-backend/pkg/service"
 	"io"
 	"io/ioutil"
 	"log"
@@ -19,7 +16,10 @@ import (
 	"github.com/jenkins-zh/wechat-backend/pkg/article"
 	"github.com/jenkins-zh/wechat-backend/pkg/config"
 	"github.com/jenkins-zh/wechat-backend/pkg/github"
+	"github.com/jenkins-zh/wechat-backend/pkg/health"
+	"github.com/jenkins-zh/wechat-backend/pkg/menu"
 	"github.com/jenkins-zh/wechat-backend/pkg/reply"
+	"github.com/jenkins-zh/wechat-backend/pkg/service"
 )
 
 // WeChat represents WeChat
@@ -161,7 +161,6 @@ func main() {
 
 	http.HandleFunc("/", wechat.procRequest)
 	http.HandleFunc("/status", health.SimpleHealthHandler)
-	//http.HandleFunc("/status", healthHandler)
 	http.HandleFunc("/medias", func(w http.ResponseWriter, r *http.Request) {
 		api.ListMedias(w, r, configurator)
 	})

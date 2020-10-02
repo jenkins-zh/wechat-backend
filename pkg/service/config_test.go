@@ -4,8 +4,8 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	"github.com/linuxsuren/wechat-backend/pkg/config"
-	"github.com/linuxsuren/wechat-backend/pkg/service"
+	"github.com/jenkins-zh/wechat-backend/pkg/config"
+	"github.com/jenkins-zh/wechat-backend/pkg/service"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
