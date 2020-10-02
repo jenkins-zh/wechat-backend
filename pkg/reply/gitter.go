@@ -6,7 +6,7 @@ import (
 	"net/url"
 	"strings"
 
-	core "github.com/linuxsuren/wechat-backend/pkg"
+	core "github.com/jenkins-zh/wechat-backend/pkg"
 )
 
 // GitterAutoReply only reply for match

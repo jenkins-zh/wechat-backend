@@ -68,7 +68,6 @@ func CreateWxMenu(config *config.WeChatConfig) {
         }`
 
 	//发送建立菜单的post请求
-	//token := token.GetAccessToken(config)
 	token := api.GetAccessToken(config)
 	pushWxMenuCreate(token, []byte(menuStr))
 }

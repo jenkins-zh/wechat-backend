@@ -7,7 +7,7 @@ import (
 
 	"io/ioutil"
 
-	core "github.com/linuxsuren/wechat-backend/pkg"
+	core "github.com/jenkins-zh/wechat-backend/pkg"
 	yaml "gopkg.in/yaml.v2"
 )
 
