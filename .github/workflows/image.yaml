@@ -13,5 +13,5 @@ jobs:
       - name: Build
         run: |
           docker login --username ${{ secrets.DOCKER_HUB_USER }} --password ${{secrets.DOCKER_HUB_TOKEN}}
-          docker build -t jenkinszh/wechat-backend:v0.0.1 .
-          docker push jenkinszh/wechat-backend:v0.0.1
+          docker build -t jenkinszh/wechat-backend:v0.0.2 .
+          docker push jenkinszh/wechat-backend:v0.0.2
