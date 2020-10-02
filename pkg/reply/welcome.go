@@ -3,7 +3,7 @@ package reply
 import (
 	"fmt"
 
-	core "github.com/linuxsuren/wechat-backend/pkg"
+	core "github.com/jenkins-zh/wechat-backend/pkg"
 )
 
 // WelcomeReply for welcome event

@@ -4,7 +4,7 @@ import (
 	"encoding/xml"
 	"time"
 
-	core "github.com/linuxsuren/wechat-backend/pkg"
+	core "github.com/jenkins-zh/wechat-backend/pkg"
 )
 
 // AutoReply represent auto reply interface

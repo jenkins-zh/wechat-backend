@@ -4,6 +4,7 @@ import (
 	"crypto/sha1"
 	"encoding/xml"
 	"fmt"
+	"github.com/jenkins-zh/wechat-backend/pkg/api"
 	"io"
 	"io/ioutil"
 	"log"
@@ -11,14 +12,14 @@ import (
 	"sort"
 	"strings"
 
-	core "github.com/linuxsuren/wechat-backend/pkg"
-	"github.com/linuxsuren/wechat-backend/pkg/article"
-	"github.com/linuxsuren/wechat-backend/pkg/config"
-	"github.com/linuxsuren/wechat-backend/pkg/github"
-	"github.com/linuxsuren/wechat-backend/pkg/health"
-	"github.com/linuxsuren/wechat-backend/pkg/menu"
-	"github.com/linuxsuren/wechat-backend/pkg/reply"
-	"github.com/linuxsuren/wechat-backend/pkg/service"
+	core "github.com/jenkins-zh/wechat-backend/pkg"
+	"github.com/jenkins-zh/wechat-backend/pkg/article"
+	"github.com/jenkins-zh/wechat-backend/pkg/config"
+	"github.com/jenkins-zh/wechat-backend/pkg/github"
+	"github.com/jenkins-zh/wechat-backend/pkg/health"
+	"github.com/jenkins-zh/wechat-backend/pkg/menu"
+	"github.com/jenkins-zh/wechat-backend/pkg/reply"
+	"github.com/jenkins-zh/wechat-backend/pkg/service"
 )
 
 // WeChat represents WeChat
@@ -72,7 +73,9 @@ func (we *WeChat) procRequest(w http.ResponseWriter, r *http.Request) {
 }
 
 func (we *WeChat) normalRequest(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Welcome aboard Jenkins WeChat."))
+	if _, err := w.Write([]byte("Welcome aboard Jenkins WeChat.")); err != nil {
+		fmt.Printf("got error when response normal request, %v", err)
+	}
 }
 
 func (we *WeChat) wechatRequest(writer http.ResponseWriter, r *http.Request) {
@@ -158,6 +161,9 @@ func main() {
 
 	http.HandleFunc("/", wechat.procRequest)
 	http.HandleFunc("/status", health.SimpleHealthHandler)
+	http.HandleFunc("/medias", func(w http.ResponseWriter, r *http.Request) {
+		api.ListMedias(w, r, configurator)
+	})
 	http.HandleFunc("/webhook", func(w http.ResponseWriter, r *http.Request) {
 		github.WebhookHandler(w, r, weConfig, defaultRM.InitCheck)
 	})

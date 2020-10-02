@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/linuxsuren/wechat-backend/pkg/config"
-	"github.com/linuxsuren/wechat-backend/pkg/token"
+	"github.com/jenkins-zh/wechat-backend/pkg/api"
+	"github.com/jenkins-zh/wechat-backend/pkg/config"
 )
 
 func pushWxMenuCreate(accessToken string, menuJsonBytes []byte) error {
@@ -68,6 +68,7 @@ func CreateWxMenu(config *config.WeChatConfig) {
         }`
 
 	//发送建立菜单的post请求
-	token := token.GetAccessToken(config)
+	//token := token.GetAccessToken(config)
+	token := api.GetAccessToken(config)
 	pushWxMenuCreate(token, []byte(menuStr))
 }

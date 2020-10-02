@@ -1,8 +1,14 @@
-TAG=dev-$(shell git rev-parse HEAD | cut -c 1-8)
+CGO_ENABLED = 0
+
+TAG=dev-$(shell cat .version)-$(shell git config --get user.email | sed -e "s/@/-/")
 
 build:
 	CGO_ENABLED=0 GOOS=linux go build -ldflags "-w -s" -a -installsuffix cgo -o bin/wechat-backend
 	upx bin/wechat-backend
+
+run:
+	CGO_ENABLED=0 go build -ldflags "-w -s" -a -installsuffix cgo -o bin/wechat-backend
+	./bin/wechat-backend
 
 build-local:
 	env go build -o bin/wechat-backend
@@ -39,3 +45,6 @@ update-alauda:
 restart:
 	kubectl scale deploy/wechat --replicas=0
 	kubectl scale deploy/wechat --replicas=1
+
+test:
+	go test ./... -v -coverprofile coverage.out

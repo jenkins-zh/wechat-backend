@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	core "github.com/linuxsuren/wechat-backend/pkg"
+	core "github.com/jenkins-zh/wechat-backend/pkg"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

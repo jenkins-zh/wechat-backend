@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/linuxsuren/wechat-backend/pkg/config"
+	"github.com/jenkins-zh/wechat-backend/pkg/config"
 	"gopkg.in/go-playground/webhooks.v5/github"
 )
 

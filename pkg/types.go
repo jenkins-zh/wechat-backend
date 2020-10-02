@@ -47,6 +47,14 @@ type ImageResponseBody struct {
 	Image        Image
 }
 
+// RandomResponseBody is not a regular type from wechat system
+type RandomResponseBody struct {
+	ResponseBody `yaml:",inline"`
+	XMLName      xml.Name `xml:"xml"`
+	Items        []string
+	Content      string
+}
+
 type Articles struct {
 	// XMLName  xml.Name  `xml:"Articles"`
 	Articles []Article `xml:"item"`

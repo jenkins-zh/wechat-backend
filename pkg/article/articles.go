@@ -8,8 +8,8 @@ import (
 
 	"strings"
 
-	core "github.com/linuxsuren/wechat-backend/pkg"
-	"github.com/linuxsuren/wechat-backend/pkg/config"
+	core "github.com/jenkins-zh/wechat-backend/pkg"
+	"github.com/jenkins-zh/wechat-backend/pkg/config"
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/yaml.v2"
 )
@@ -19,6 +19,7 @@ const (
 )
 
 type ResponseManager interface {
+	// GetResponse find the response, return false if there's no the correct one
 	GetResponse(string) (interface{}, bool)
 	InitCheck(weConfig *config.WeChatConfig)
 }
@@ -54,6 +55,7 @@ func (drm *DefaultResponseManager) InitCheck(weConfig *config.WeChatConfig) {
 				log.Println("clone failure", err)
 				return
 			}
+			log.Println("the clone progress is done")
 		} else {
 			r, err := git.PlainOpen(CONFIG)
 			if err == nil {
@@ -110,8 +112,12 @@ func (drm *DefaultResponseManager) responseHandler(yamlContent []byte) {
 			news := core.NewsResponseBody{}
 			yaml.Unmarshal(yamlContent, &news)
 			drm.ResponseMap[reps.Keyword] = news
+		case "random": // TODO this not the regular way
+			random := core.RandomResponseBody{}
+			yaml.Unmarshal(yamlContent, &random)
+			drm.ResponseMap[reps.Keyword] = random
 		default:
-			log.Println("unknow type", reps.MsgType)
+			log.Println("unknown type", reps.MsgType)
 		}
 	} else {
 		fmt.Println(err)

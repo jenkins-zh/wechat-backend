@@ -1,8 +1,4 @@
-<<<<<<< HEAD:pkg/token/token.go
-package token
-=======
 package api
->>>>>>> master:pkg/api/token.go
 
 import (
 	"encoding/json"

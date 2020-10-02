@@ -17,3 +17,4 @@ wechat-backend
 
 # test data files
 pkg/reply/*.yaml
+.idea
