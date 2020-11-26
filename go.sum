@@ -80,6 +80,7 @@ gopkg.in/fsnotify.v1 v1.4.7 h1:xOHLXZwVvI9hhs+cLKq5+I5onOuwQLhQwiu63xxlHs4=
 gopkg.in/fsnotify.v1 v1.4.7/go.mod h1:Tz8NjZHkW78fSQdbUxIjBTcgA1z1m8ZHf0WmKUhAMys=
 gopkg.in/go-playground/webhooks.v5 v5.13.0 h1:e9vtkQZK464+UdL3YjRox2yR8JSmh2094PUBMvdriFs=
 gopkg.in/go-playground/webhooks.v5 v5.13.0/go.mod h1:LZbya/qLVdbqDR1aKrGuWV6qbia2zCYSR5dpom2SInQ=
+gopkg.in/go-playground/webhooks.v5 v5.16.0/go.mod h1:LZbya/qLVdbqDR1aKrGuWV6qbia2zCYSR5dpom2SInQ=
 gopkg.in/src-d/go-billy.v4 v4.3.2 h1:0SQA1pRztfTFx2miS8sA97XvooFeNOmvUenF4o0EcVg=
 gopkg.in/src-d/go-billy.v4 v4.3.2/go.mod h1:nDjArDMp+XMs1aFAESLRjfGSgfvoYN0hDfzEk0GjC98=
 gopkg.in/src-d/go-git-fixtures.v3 v3.5.0/go.mod h1:dLBcvytrw/TYZsNTWCnkNF2DSIlzWYqTe3rJR56Ac7g=
